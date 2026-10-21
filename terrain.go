@@ -177,7 +177,7 @@ func terrainAt(x, y float64) string {
 }
 
 // f1 is x with one decimal, rounding a tie up, as JavaScript's toFixed(1)
-// does, so the map is the one tools/map.mjs drew for the mockup.
+// does, so the map is the one the mockup drew in JavaScript.
 func f1(x float64) string {
 	exact := new(big.Float).SetFloat64(x).Text('f', 80)
 	whole, frac, _ := strings.Cut(exact, ".")
@@ -354,7 +354,7 @@ func drawSVG(seed int64) (land, labels, placed template.HTML) {
 	return land, labels, placed
 }
 
-// escape escapes text for SVG the way tools/map.mjs did: & and < only.
+// escape escapes text for SVG the way the mockup did: & and < only.
 func escape(s string) string {
 	return strings.NewReplacer("&", "&amp;", "<", "&lt;").Replace(s)
 }

@@ -197,7 +197,7 @@ h3{font:800 20px/1.2 var(--body);margin:0 0 8px}
 .ground-items{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:6px;font-size:15px}
 .ground-items code{color:var(--mute)}
 @media (max-width:900px){.map-layout{grid-template-columns:1fr}}
-/* markers the pages put on the map; the terrain under them is assets/terrain.svg */
+/* markers the pages put on the map, over the terrain from terrain.go */
 .map-player-dot{fill:var(--paper);stroke-dasharray:3 2}
 .map-player.online .map-player-dot{fill:var(--blue);stroke-dasharray:none}
 .map-player.npc .map-player-dot{fill:var(--sun);stroke-dasharray:none}
