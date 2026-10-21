@@ -52,18 +52,25 @@ func main() {
 	}
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
+	closed := make(chan struct{})
 	go func() {
+		defer close(closed)
 		<-ctx.Done()
 		close(stop)
 		shutdown, done := context.WithTimeout(context.Background(), 10*time.Second)
 		defer done()
-		srv.Shutdown(shutdown)
+		if err := srv.Shutdown(shutdown); err != nil {
+			slog.Warn("cannot finish the requests in time", "err", err)
+		}
 	}()
 	slog.Info("serving", "addr", *addr, "data", *data)
 	if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		slog.Error("cannot serve", "err", err)
 		os.Exit(1)
 	}
+	// ListenAndServe returns as soon as the shutdown starts: wait for the
+	// requests in flight to finish
+	<-closed
 }
 
 // Handler serves the site from the game game() returns, at the time now()
