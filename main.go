@@ -85,6 +85,7 @@ func (s *Site) Handler(game func() *Game, now func() time.Time) http.Handler {
 	}
 	mux.HandleFunc("GET /{$}", page("index", indexData))
 	mux.HandleFunc("GET /players", page("players", playersData))
+	mux.HandleFunc("GET /map", page("map", mapData))
 	mux.HandleFunc("GET /static/", func(w http.ResponseWriter, r *http.Request) {
 		a, ok := s.assets[r.URL.Path]
 		if !ok {

@@ -139,6 +139,8 @@ func (s *Site) funcs() template.FuncMap {
 		"iso":       func(t time.Time) string { return t.UTC().Format(time.RFC3339) },
 		"podium":    Podium,
 		"inc":       func(i int) int { return i + 1 },
+		"slotName":  slotName,
+		"at":        at,
 	}
 }
 
@@ -560,4 +562,73 @@ func heads(names ...string) []Cell {
 		cells[i] = Cell{Text: n, Class: "t-hi"}
 	}
 	return cells
+}
+
+// slots are the item slots, in the order the bot lists them, and their names.
+var slots = [][2]string{
+	{"amulet", "амулет"},
+	{"charm", "оберіг"},
+	{"helm", "шолом"},
+	{"boots", "чоботи"},
+	{"gloves", "рукавиці"},
+	{"ring", "каблучка"},
+	{"leggings", "поножі"},
+	{"shield", "щит"},
+	{"tunic", "туніка"},
+	{"weapon", "зброя"},
+}
+
+func slotName(slot string) string {
+	for _, s := range slots {
+		if s[0] == slot {
+			return s[1]
+		}
+	}
+	return slot
+}
+
+type mapView struct {
+	Terrain *Terrain
+	Markers template.HTML
+	ASCII   template.HTML
+	// the terminal's tables: where everyone and everything is, and the places
+	Where, Places template.HTML
+}
+
+func at(x, y int) string { return fmt.Sprintf("[%d, %d]", x, y) }
+
+func everyone(*Player) bool { return true }
+
+func mapData(p *Page) (any, bool) {
+	v := mapView{Terrain: terrain}
+	g := p.Game
+	if g == nil {
+		return v, true
+	}
+	v.Markers = Markers{}.SVG(g)
+	v.ASCII = terrain.ASCII(g, everyone)
+	var rows [][]Cell
+	for _, pl := range g.Players {
+		status := pl.StatusWord()
+		if pl.NPC {
+			status = "npc"
+		}
+		rows = append(rows, []Cell{{Text: pl.Name, URL: playerURL(pl.Name)}, {Text: at(pl.X, pl.Y)},
+			{Text: quarterOf(pl.X, pl.Y)}, {Text: status, Class: pl.StatusColour()}})
+	}
+	for _, it := range g.MapItems {
+		rows = append(rows, []Cell{{Text: fmt.Sprintf("%s %d", slotName(it.Type), it.Level), Class: "t-bad"},
+			{Text: at(it.X, it.Y)}, {Text: quarterOf(it.X, it.Y)}, {Text: "на землі"}})
+	}
+	v.Where = asciiTable([]int{14, 10, 15, 8}, heads("що", "де", "частина", "стан"), rows)
+	rows = nil
+	for i, pl := range append([]Place{capital}, places...) {
+		class := "t-hi"
+		if i == 0 {
+			class = "t-gold"
+		}
+		rows = append(rows, []Cell{{Text: pl.Name, Class: class}, {Text: at(pl.X, pl.Y)}, {Text: quarterOf(pl.X, pl.Y)}})
+	}
+	v.Places = asciiTable([]int{26, 10, 15}, heads("місце", "де", "частина"), rows)
+	return v, true
 }

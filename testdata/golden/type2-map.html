@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мапа · IdleRPG</title>
+<meta name="description" content="IdleRPG на UAnet: гра в IRC-каналі #idlerpg, де рівні ростуть, поки ви нічого не робите.">
+<meta name="theme-color" content="#fffdf5">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='11' cy='16' r='9' fill='%23ffd43b'/%3E%3Ccircle cx='21' cy='16' r='9' fill='%232338ff'/%3E%3C/svg%3E">
+<link rel="preload" href="/static/fonts/unbounded-900.HASH.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/fixel-text-var.HASH.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/style.HASH.css">
+<script>try{if(localStorage.getItem('rpg-mode')==='term')document.documentElement.dataset.mode='term'}catch(e){}</script>
+<script src="/static/app.HASH.js" defer></script>
+</head>
+<body>
+
+<div class="paper-view">
+  <header class="site-header">
+    <div class="container site-nav">
+      <a class="logo" href="/"><i></i><span>UAnet</span><b>IdleRPG</b></a>
+      <nav class="tabs" aria-label="Розділи">
+        <a href="/">Головна</a>
+        <a href="/players">Гравці</a>
+        <a href="/map" aria-current="page">Мапа</a>
+        <a href="/quest">Квест</a>
+      </nav>
+      <span class="updated">оновлено 04:45 · 2 хв тому</span>
+      <button class="olds-btn" type="button" data-mode-toggle hidden>&gt;_ Для олдів</button>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="container section">
+      <h1>Мапа світу</h1>
+      <p class="lede page-intro">Світ 500 × 500. Персонажі блукають самі, підбирають предмети з землі й зустрічаються в бою. Натисніть на гравця, щоб відкрити профіль.</p>
+      <div class="map-layout">
+        <div class="box padded map-frame">
+          <svg viewBox="0 0 500 500" role="img" aria-label="Мапа світу 500 на 500">
+  <rect width="500" height="500" fill="#fff8e3"/>
+  <path d="M50 0V500M0 50H500M100 0V500M0 100H500M150 0V500M0 150H500M200 0V500M0 200H500M300 0V500M0 300H500M350 0V500M0 350H500M400 0V500M0 400H500M450 0V500M0 450H500" fill="none" stroke="#e7dfc2"/>
+  <!-- dark lands -->
+  <circle cx="440" cy="385" r="55" fill="#d9d2ea"/>
+  <path d="M418.1 334.9L389.9 363.1M431.7 331.2L386.2 376.7M442.1 330.8L385.8 387.1M450.8 331.9L386.9 395.8M458.5 334.2L389.2 403.5M465.3 337.3L392.3 410.3M471.4 341.1L396.1 416.4M476.8 345.5L400.5 421.8M481.6 350.6L405.6 426.6M485.8 356.4L411.4 430.8M489.3 362.8L417.8 434.3M492.0 370.0L425.0 437.0M493.8 378.1L433.1 438.8M494.3 387.5L442.5 439.3M492.7 399.0L454.0 437.7M484.4 417.1L472.1 429.4" fill="none" stroke="#4b4870"/>
+  <circle cx="440" cy="385" r="55" fill="none" stroke="#14123a" stroke-width="2.5" stroke-dasharray="8 5"/>
+  <!-- swamp -->
+  <path d="M287.1 455.1h8M259.3 436.6h8M249.6 466.2h8M286.5 451.1h8M243.1 451.5h8M286.4 475.3h8M280.6 440.8h8M261.5 472.9h8M268.7 473.9h8M286.8 474.6h8M228.7 447.9h8M260.2 445.0h8M248.4 451.8h8M276.9 436.3h8M237.2 459.2h8M261.4 459.0h8M296.5 460.2h8M288.5 438.8h8M232.5 441.4h8M245.9 440.2h8M247.8 468.1h8M243.8 478.1h8M255.6 461.2h8M246.9 452.4h8M241.2 460.9h8M264.2 463.6h8M287.5 452.8h8M291.4 474.1h8M233.4 467.2h8M271.3 479.5h8M276.7 454.5h8M251.9 434.2h8M232.1 466.6h8M275.2 484.2h8M264.9 444.5h8M273.9 457.4h8M246.6 438.1h8M261.1 480.6h8M249.5 453.5h8M282.1 452.8h8M263.1 436.6h8M243.7 425.2h8M237.6 460.0h8M282.7 443.3h8M281.2 452.1h8M270.2 422.8h8M259.8 428.1h8M273.2 431.8h8M253.6 474.7h8M252.0 477.3h8M234.4 443.2h8M284.3 464.7h8M257.6 456.0h8M254.2 433.6h8M228.1 466.4h8M277.6 471.7h8M254.9 477.3h8M261.9 476.8h8M252.4 421.3h8M285.7 457.8h8" fill="none" stroke="#6aa58a" stroke-width="2" stroke-linecap="round"/>
+  <!-- river and lake -->
+  <path d="M0 70 L70 95 L140 150 L190 230 L250 275 L330 300 L400 360 L455 430 L500 470" fill="none" stroke="#bfe3ff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M0 70 L70 95 L140 150 L190 230 L250 275 L330 300 L400 360 L455 430 L500 470" fill="none" stroke="#2338ff" stroke-opacity=".35" stroke-width="2" stroke-dasharray="6 6"/>
+  <circle cx="425" cy="175" r="36" fill="#bfe3ff" stroke="#14123a" stroke-width="3"/>
+  <!-- forests -->
+  <g fill="#3ddc9f" stroke="#14123a" stroke-width="1.5">
+    <circle cx="100.9" cy="145.1" r="5.4"/>
+    <circle cx="70.5" cy="188.5" r="7.4"/>
+    <circle cx="74.3" cy="186.7" r="6.8"/>
+    <circle cx="72.0" cy="199.5" r="6.2"/>
+    <circle cx="69.6" cy="214.1" r="5.6"/>
+    <circle cx="74.3" cy="226.6" r="5.6"/>
+    <circle cx="66.1" cy="147.5" r="7.4"/>
+    <circle cx="105.9" cy="199.4" r="5.7"/>
+    <circle cx="78.8" cy="197.5" r="7.9"/>
+    <circle cx="79.2" cy="140.1" r="6.6"/>
+    <circle cx="54.8" cy="180.0" r="5.9"/>
+    <circle cx="60.4" cy="198.4" r="6.3"/>
+    <circle cx="72.0" cy="204.7" r="5.3"/>
+    <circle cx="80.8" cy="146.3" r="5.0"/>
+    <circle cx="63.3" cy="207.5" r="5.6"/>
+    <circle cx="128.5" cy="168.2" r="5.7"/>
+    <circle cx="62.8" cy="176.6" r="7.6"/>
+    <circle cx="62.9" cy="210.9" r="7.0"/>
+    <circle cx="98.7" cy="167.0" r="7.0"/>
+    <circle cx="134.4" cy="176.9" r="5.4"/>
+    <circle cx="78.2" cy="185.4" r="6.6"/>
+    <circle cx="101.2" cy="209.6" r="5.5"/>
+    <circle cx="91.7" cy="153.9" r="5.6"/>
+    <circle cx="62.4" cy="214.8" r="6.2"/>
+    <circle cx="121.6" cy="168.0" r="6.4"/>
+    <circle cx="53.5" cy="141.2" r="6.5"/>
+    <circle cx="70.8" cy="181.6" r="7.3"/>
+    <circle cx="107.0" cy="208.8" r="6.8"/>
+    <circle cx="67.6" cy="203.9" r="5.7"/>
+    <circle cx="98.9" cy="146.2" r="6.9"/>
+    <circle cx="73.1" cy="177.3" r="6.9"/>
+    <circle cx="76.1" cy="160.7" r="7.4"/>
+    <circle cx="87.5" cy="188.8" r="6.4"/>
+    <circle cx="81.3" cy="129.1" r="6.6"/>
+    <circle cx="123.8" cy="188.6" r="6.1"/>
+    <circle cx="54.7" cy="178.3" r="6.1"/>
+    <circle cx="111.1" cy="140.1" r="7.7"/>
+    <circle cx="74.2" cy="174.2" r="7.2"/>
+    <circle cx="82.3" cy="217.1" r="5.1"/>
+    <circle cx="45.9" cy="185.8" r="7.6"/>
+    <circle cx="60.7" cy="218.2" r="7.9"/>
+    <circle cx="51.9" cy="188.4" r="7.7"/>
+    <circle cx="94.5" cy="179.5" r="6.4"/>
+    <circle cx="281.8" cy="191.3" r="6.6"/>
+    <circle cx="288.3" cy="177.3" r="6.9"/>
+    <circle cx="318.1" cy="216.2" r="7.4"/>
+    <circle cx="319.4" cy="193.4" r="5.3"/>
+    <circle cx="272.2" cy="207.6" r="7.9"/>
+    <circle cx="285.8" cy="206.7" r="8.0"/>
+    <circle cx="305.3" cy="179.4" r="5.9"/>
+    <circle cx="326.1" cy="209.5" r="6.9"/>
+    <circle cx="322.8" cy="184.9" r="7.6"/>
+    <circle cx="312.5" cy="213.5" r="5.2"/>
+    <circle cx="295.7" cy="211.4" r="6.3"/>
+    <circle cx="297.0" cy="171.7" r="5.7"/>
+    <circle cx="275.9" cy="208.5" r="6.9"/>
+    <circle cx="273.2" cy="198.1" r="7.4"/>
+    <circle cx="298.4" cy="210.8" r="7.0"/>
+    <circle cx="302.1" cy="215.4" r="5.7"/>
+    <circle cx="292.6" cy="189.7" r="6.8"/>
+    <circle cx="292.7" cy="204.7" r="6.6"/>
+    <circle cx="285.6" cy="209.1" r="7.8"/>
+    <circle cx="309.2" cy="198.6" r="5.8"/>
+    <circle cx="290.7" cy="171.0" r="6.6"/>
+    <circle cx="326.6" cy="198.3" r="6.2"/>
+    <circle cx="308.2" cy="205.6" r="6.2"/>
+    <circle cx="315.2" cy="200.7" r="7.1"/>
+    <circle cx="302.1" cy="203.4" r="7.1"/>
+    <circle cx="300.6" cy="187.7" r="7.6"/>
+    <circle cx="279.7" cy="190.5" r="7.3"/>
+  </g>
+  <!-- hills -->
+  <g fill="#e8e4d4" stroke="#14123a" stroke-width="2" stroke-linecap="round">
+    <path d="M159.6 389.3 q9 -12 18 0"/>
+    <path d="M149.9 381.5 q9 -12 18 0"/>
+    <path d="M138.2 387.6 q9 -12 18 0"/>
+    <path d="M153.2 399.9 q9 -12 18 0"/>
+    <path d="M140.3 383.7 q9 -12 18 0"/>
+    <path d="M149.2 403.1 q9 -12 18 0"/>
+    <path d="M144.5 399.1 q9 -12 18 0"/>
+    <path d="M141.7 389.7 q9 -12 18 0"/>
+    <path d="M148.4 376.1 q9 -12 18 0"/>
+  </g>
+  <!-- mountains -->
+  <g stroke="#14123a" stroke-linejoin="round">
+    <path d="M61.3 337.3 L74.1 319.0 L86.9 337.3Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M70.1 324.8 L74.1 319.0 L78.1 324.8" fill="#fff" stroke-width="1.5"/>
+    <path d="M39.9 364.8 L52.8 346.4 L65.6 364.8Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M48.7 352.3 L52.8 346.4 L56.8 352.3" fill="#fff" stroke-width="1.5"/>
+    <path d="M42.8 319.7 L58.4 297.4 L74.0 319.7Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M53.5 304.6 L58.4 297.4 L63.3 304.6" fill="#fff" stroke-width="1.5"/>
+    <path d="M31.2 335.4 L41.0 321.4 L50.9 335.4Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M37.9 325.8 L41.0 321.4 L44.1 325.8" fill="#fff" stroke-width="1.5"/>
+    <path d="M70.1 343.4 L81.3 327.4 L92.5 343.4Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M77.8 332.5 L81.3 327.4 L84.8 332.5" fill="#fff" stroke-width="1.5"/>
+    <path d="M44.3 332.5 L57.2 314.1 L70.1 332.5Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M53.1 320.0 L57.2 314.1 L61.2 320.0" fill="#fff" stroke-width="1.5"/>
+    <path d="M53.6 363.3 L65.6 346.1 L77.6 363.3Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M61.8 351.6 L65.6 346.1 L69.4 351.6" fill="#fff" stroke-width="1.5"/>
+    <path d="M69.8 340.0 L84.5 319.1 L99.1 340.0Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M79.9 325.8 L84.5 319.1 L89.1 325.8" fill="#fff" stroke-width="1.5"/>
+    <path d="M42.3 333.4 L55.4 314.8 L68.4 333.4Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M51.3 320.7 L55.4 314.8 L59.5 320.7" fill="#fff" stroke-width="1.5"/>
+    <path d="M22.1 341.1 L33.4 324.9 L44.8 341.1Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M29.9 330.1 L33.4 324.9 L37.0 330.1" fill="#fff" stroke-width="1.5"/>
+    <path d="M45.0 325.4 L56.2 309.5 L67.3 325.4Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M52.7 314.6 L56.2 309.5 L59.7 314.6" fill="#fff" stroke-width="1.5"/>
+    <path d="M59.0 380.7 L71.3 363.2 L83.6 380.7Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M67.5 368.8 L71.3 363.2 L75.2 368.8" fill="#fff" stroke-width="1.5"/>
+    <path d="M61.3 326.3 L77.3 303.4 L93.3 326.3Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M72.2 310.7 L77.3 303.4 L82.3 310.7" fill="#fff" stroke-width="1.5"/>
+    <path d="M33.8 368.0 L45.5 351.3 L57.2 368.0Z" fill="#e8e4d4" stroke-width="2"/>
+    <path d="M41.8 356.7 L45.5 351.3 L49.2 356.7" fill="#fff" stroke-width="1.5"/>
+  </g>
+  <!-- the four parts of the realm -->
+  <path d="M250 0 V500 M0 250 H500" fill="none" stroke="#14123a" stroke-opacity=".45" stroke-width="2" stroke-dasharray="12 6"/>
+  <g font-size="10.5" font-weight="800" letter-spacing="1.5" fill="#14123a" fill-opacity=".6" stroke="#fff8e3" stroke-width="4" paint-order="stroke">
+    <text x="7" y="243" text-anchor="start">ПІВНІЧНИЙ ЗАХІД</text>
+    <text x="493" y="243" text-anchor="end">ПІВНІЧНИЙ СХІД</text>
+    <text x="7" y="266" text-anchor="start">ПІВДЕННИЙ ЗАХІД</text>
+    <text x="493" y="266" text-anchor="end">ПІВДЕННИЙ СХІД</text>
+  </g>
+  <g font-size="12.5" font-weight="700" font-style="italic" fill="#4b4870" stroke="#fff8e3" stroke-width="4" paint-order="stroke">
+    <text x="425" y="179" text-anchor="middle">Синє Озеро</text>
+    <text x="85" y="226" text-anchor="middle">Старий Ліс</text>
+    <text x="300" y="240" text-anchor="middle">Тихий Гай</text>
+    <text x="265" y="496" text-anchor="middle">Туманні Болота</text>
+    <text x="8" y="416" text-anchor="start">Великі гори Шахліль</text>
+    <text x="492" y="457" text-anchor="end">Темні землі Т'рнальвфа</text>
+  </g>
+  <g font-size="11" font-weight="600" fill="#14123a" stroke="#fff8e3" stroke-width="4" paint-order="stroke">
+    <text x="225" y="305" text-anchor="middle">Вежі Анкх-Аллора</text>
+    <text x="289" y="364" text-anchor="start">лігво чаклуна Крука</text>
+    <text x="299" y="69" text-anchor="start">троль Докт'р Вііі</text>
+    <text x="471" y="319" text-anchor="end">місто Вельврах</text>
+    <text x="79" y="319" text-anchor="start">таємний хід до Бхараша</text>
+    <text x="176" y="362" text-anchor="start">лігво Грабтула</text>
+    <text x="160" y="397" text-anchor="middle">вовчі пагорби</text>
+    <text x="44" y="44" text-anchor="start">табір армії Данії</text>
+    <text x="226" y="129" text-anchor="end">перевал</text>
+    <text x="430" y="50" text-anchor="middle">країна Квок</text>
+    <text x="164" y="159" text-anchor="start">плем'я Джоу Ботзі</text>
+    <text x="70" y="115" text-anchor="middle">зомбі Джоу Ботзі</text>
+    <text x="179" y="104" text-anchor="start">зомбі Джоу Ботзі</text>
+    <text x="370" y="342" text-anchor="middle">архів логів</text>
+    <text x="270" y="120" text-anchor="middle">архів логів</text>
+    <text x="155" y="57" text-anchor="middle">комп'ютер старого адміна</text>
+    <text x="334" y="134" text-anchor="start">комп'ютер старого адміна</text>
+  </g>
+  <!-- quest places -->
+  <g fill="#14123a" stroke="#14123a" stroke-width="1.2">
+    <g><title>Вежі Анкх-Аллора [225, 315]</title><circle cx="225" cy="315" r="3.2" stroke="none"/><circle cx="225" cy="315" r="6" fill="none"/></g>
+    <g><title>лігво чаклуна Крука [280, 360]</title><circle cx="280" cy="360" r="3.2" stroke="none"/><circle cx="280" cy="360" r="6" fill="none"/></g>
+    <g><title>темні землі Т'рнальвфа [400, 375]</title><circle cx="400" cy="375" r="3.2" stroke="none"/><circle cx="400" cy="375" r="6" fill="none"/></g>
+    <g><title>темні землі Т'рнальвфа [480, 380]</title><circle cx="480" cy="380" r="3.2" stroke="none"/><circle cx="480" cy="380" r="6" fill="none"/></g>
+    <g><title>троль Докт'р Вііі [290, 65]</title><circle cx="290" cy="65" r="3.2" stroke="none"/><circle cx="290" cy="65" r="6" fill="none"/></g>
+    <g><title>місто Вельврах [480, 315]</title><circle cx="480" cy="315" r="3.2" stroke="none"/><circle cx="480" cy="315" r="6" fill="none"/></g>
+    <g><title>таємний хід до Бхараша [70, 315]</title><circle cx="70" cy="315" r="3.2" stroke="none"/><circle cx="70" cy="315" r="6" fill="none"/></g>
+    <g><title>Великі гори Шахліль [50, 350]</title><circle cx="50" cy="350" r="3.2" stroke="none"/><circle cx="50" cy="350" r="6" fill="none"/></g>
+    <g><title>лігво Грабтула [167, 358]</title><circle cx="167" cy="358" r="3.2" stroke="none"/><circle cx="167" cy="358" r="6" fill="none"/></g>
+    <g><title>вовчі пагорби [160, 380]</title><circle cx="160" cy="380" r="3.2" stroke="none"/><circle cx="160" cy="380" r="6" fill="none"/></g>
+    <g><title>табір армії Данії [35, 40]</title><circle cx="35" cy="40" r="3.2" stroke="none"/><circle cx="35" cy="40" r="6" fill="none"/></g>
+    <g><title>перевал [235, 125]</title><circle cx="235" cy="125" r="3.2" stroke="none"/><circle cx="235" cy="125" r="6" fill="none"/></g>
+    <g><title>країна Квок [430, 60]</title><circle cx="430" cy="60" r="3.2" stroke="none"/><circle cx="430" cy="60" r="6" fill="none"/></g>
+    <g><title>плем'я Джоу Ботзі [155, 155]</title><circle cx="155" cy="155" r="3.2" stroke="none"/><circle cx="155" cy="155" r="6" fill="none"/></g>
+    <g><title>зомбі Джоу Ботзі [70, 125]</title><circle cx="70" cy="125" r="3.2" stroke="none"/><circle cx="70" cy="125" r="6" fill="none"/></g>
+    <g><title>зомбі Джоу Ботзі [170, 100]</title><circle cx="170" cy="100" r="3.2" stroke="none"/><circle cx="170" cy="100" r="6" fill="none"/></g>
+    <g><title>архів логів [370, 325]</title><circle cx="370" cy="325" r="3.2" stroke="none"/><circle cx="370" cy="325" r="6" fill="none"/></g>
+    <g><title>архів логів [270, 130]</title><circle cx="270" cy="130" r="3.2" stroke="none"/><circle cx="270" cy="130" r="6" fill="none"/></g>
+    <g><title>комп'ютер старого адміна [155, 40]</title><circle cx="155" cy="40" r="3.2" stroke="none"/><circle cx="155" cy="40" r="6" fill="none"/></g>
+    <g><title>комп'ютер старого адміна [325, 130]</title><circle cx="325" cy="130" r="3.2" stroke="none"/><circle cx="325" cy="130" r="6" fill="none"/></g>
+  </g>
+  <!-- the capital -->
+  <g transform="translate(325 270)" stroke="#14123a">
+    <title>Столиця [325, 270]</title>
+    <path d="M-15 10 V-6 h5 v4 h4 v-4 h5 v4 h4 v-4 h5 v4 h4 v-4 h3 V10 Z" fill="#ffd43b" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M-3 10 v-7 a3 3 0 0 1 6 0 v7" fill="#14123a" stroke="none"/>
+    <path d="M0 -6 V-20 M0 -20 L9 -16.5 L0 -13" fill="#2338ff" stroke-width="2" stroke-linejoin="round"/>
+    <text y="27" text-anchor="middle" font-family="Unbounded,Arial Black,sans-serif" font-weight="900" font-size="12" fill="#14123a" stroke="#fff8e3" stroke-width="4" paint-order="stroke">Столиця</text>
+  </g>
+  <!-- coordinates -->
+  <g font-family="Ubuntu Mono,monospace" font-size="11" fill="#9b8f62">
+    <text x="103" y="12">100</text><text x="3" y="97">100</text>
+    <text x="203" y="12">200</text><text x="3" y="197">200</text>
+    <text x="303" y="12">300</text><text x="3" y="297">300</text>
+    <text x="403" y="12">400</text><text x="3" y="397">400</text>
+  </g>
+  <rect x="1.5" y="1.5" width="497" height="497" fill="none" stroke="#14123a" stroke-width="3" rx="10"/>
+<path stroke="#14123a" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round" d="M225 315 L280 360"/><g class="map-quest-point" transform="translate(225 315)"><title>Точка квесту 1: [225, 315]</title><path d="M0 -13 L3.8 -4.2 13 -4 5.8 2 8 11 0 6 -8 11 -5.8 2 -13 -4 -3.8 -4.2Z" stroke="#14123a" stroke-width="2" stroke-linejoin="round"/><text y="4" text-anchor="middle" font-family="Ubuntu Mono,monospace" font-weight="700" font-size="11" fill="#14123a">1</text></g><g class="map-quest-point" transform="translate(280 360)"><title>Точка квесту 2: [280, 360]</title><path d="M0 -13 L3.8 -4.2 13 -4 5.8 2 8 11 0 6 -8 11 -5.8 2 -13 -4 -3.8 -4.2Z" stroke="#14123a" stroke-width="2" stroke-linejoin="round"/><text y="4" text-anchor="middle" font-family="Ubuntu Mono,monospace" font-weight="700" font-size="11" fill="#14123a">2</text></g><g transform="translate(40 220)"><title>щит, рівень 13 [40, 220]</title><rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#ff6fae" stroke="#14123a" stroke-width="2"/></g><g transform="translate(355 260)"><title>каблучка, рівень 9 [355, 260]</title><rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#ff6fae" stroke="#14123a" stroke-width="2"/></g><a href="/player/Paganel"><g class="map-player online" transform="translate(131 331)"><title>Paganel, рівень 21, в грі [131, 331]</title><circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="6.5"/><text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="10.5" font-size="12">Paganel</text></g></a><a href="/player/gremax"><g class="map-player online" transform="translate(402 205)"><title>gremax, рівень 24, в грі [402, 205]</title><circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="6.5"/><text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="10.5" font-size="12">gremax</text></g></a><a href="/player/ira"><g class="map-player online" transform="translate(250 140)"><title>ira, рівень 23, в грі [250, 140]</title><circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="6.5"/><text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="10.5" font-size="12">ira</text></g></a><a href="/player/nullbyte"><g class="map-player offline" transform="translate(77 460)"><title>nullbyte, рівень 19, поза грою [77, 460]</title><circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="6.5"/><text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="10.5" font-size="12">nullbyte</text></g></a><a href="/player/devnull"><g class="map-player online" transform="translate(318 418)"><title>devnull, рівень 17, в грі [318, 418]</title><circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="6.5"/><text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="10.5" font-size="12">devnull</text></g></a><a href="/player/tim"><g class="map-player online" transform="translate(188 260)"><title>tim, рівень 6, в грі [188, 260]</title><circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="6.5"/><text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="10.5" font-size="12">tim</text></g></a><a href="/player/Clamps"><g class="map-player npc" transform="translate(232 322)"><title>Clamps (NPC), рівень 26, в грі [232, 322]</title><circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="6.5"/><circle class="map-player-quest" fill="none" stroke="#ff6fae" stroke-width="2.5" r="10.5"/><text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="10.5" font-size="12">Clamps</text></g></a><a href="/player/Don"><g class="map-player npc" transform="translate(241 330)"><title>Don (NPC), рівень 20, в грі [241, 330]</title><circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="6.5"/><circle class="map-player-quest" fill="none" stroke="#ff6fae" stroke-width="2.5" r="10.5"/><text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="10.5" font-size="12">Don</text></g></a><a href="/player/Blotto"><g class="map-player npc" transform="translate(228 335)"><title>Blotto (NPC), рівень 18, в грі [228, 335]</title><circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="6.5"/><circle class="map-player-quest" fill="none" stroke="#ff6fae" stroke-width="2.5" r="10.5"/><text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="10.5" font-size="12">Blotto</text></g></a><a href="/player/TinnyTim"><g class="map-player npc" transform="translate(236 318)"><title>TinnyTim (NPC), рівень 22, в грі [236, 318]</title><circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="6.5"/><circle class="map-player-quest" fill="none" stroke="#ff6fae" stroke-width="2.5" r="10.5"/><text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="10.5" font-size="12">TinnyTim</text></g></a>
+          </svg>
+        </div>
+        <div class="box padded">
+          <h3>Позначки</h3>
+          <ul class="legend">
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#2338ff" stroke="#14123a" stroke-width="2.5"/></svg><span>гравець у грі (5)</span></li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fffdf5" stroke="#14123a" stroke-width="2.5" stroke-dasharray="3 2"/></svg>гравець поза грою</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#ffd43b" stroke="#14123a" stroke-width="2.5"/></svg>мешканець світу (NPC)</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="4" width="12" height="12" transform="rotate(45 10 10)" fill="#ff6fae" stroke="#14123a" stroke-width="2"/></svg>предмет на землі</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path transform="translate(10 11)" d="M0 -9 L2.6 -3 9 -2.8 4 1.4 5.6 7.6 0 4.2 -5.6 7.6 -4 1.4 -9 -2.8 -2.6 -3Z" fill="#ffd43b" stroke="#14123a" stroke-width="1.6"/></svg>точка квесту</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="none" stroke="#ff6fae" stroke-width="2.5"/></svg>учасник квесту</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.2" fill="#14123a"/><circle cx="10" cy="10" r="6" fill="none" stroke="#14123a" stroke-width="1.2"/></svg>місце з квестів</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17 V9 h3 v2 h3 v-2 h2 v2 h3 v-2 h3 V17Z" fill="#ffd43b" stroke="#14123a" stroke-width="1.6" stroke-linejoin="round"/></svg>столиця</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1 V19 M1 10 H19" stroke="#14123a" stroke-opacity=".5" stroke-width="2" stroke-dasharray="4 2"/></svg>межі частин королівства</li>
+          </ul>
+          <p class="note legend-note">Королівство ділиться на чотири частини по x = 250 і y = 250. Північ угорі. За цими частинами бот проводить війни.</p>
+          <div>
+            <h3 class="ground-heading">На землі</h3>
+            <ul class="ground-items">
+              <li><span>щит, рівень 13</span> <code>[40, 220]</code></li>
+              <li><span>каблучка, рівень 9</span> <code>[355, 260]</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><span>irc.uanet.net · #idlerpg</span><a href="https://uanet.net">uanet.net</a></div>
+  </footer>
+</div>
+
+<div class="term-view">
+  <div class="container term-screen">
+    <nav class="term-nav" aria-label="Розділи">
+      <a href="/">[1] main</a>
+      <a href="/players">[2] players</a>
+      <a href="/map" aria-current="page">[3] map</a>
+      <a href="/quest">[4] quest</a>
+      <span class="updated">оновлено 04:45 · 2 хв тому</span>
+      <button type="button" data-mode-toggle hidden>[ для нових ]</button>
+    </nav>
+
+    <div>
+      <div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">idlerpg map</span></div>
+<pre class="ascii-map">   +--------------------------------------------------+
+  0|.........................|........................|
+ 20|.........................|........................|
+ 40|...<span class="t-hi">*</span>...........<span class="t-hi">*</span>.........|........................|
+ 60|~~~......................|...<span class="t-hi">*</span>.............<span class="t-hi">*</span>......|
+ 80|..~~~~~~.................|........................|
+100|.......~~~~......<span class="t-hi">*</span>.......|........................|
+120|.......<span class="t-hi">*</span><span class="t-ok">&#34;&#34;</span>~~~..........<span class="t-hi">*</span>.|.<span class="t-hi">*</span>....<span class="t-hi">*</span>.................|
+140|....<span class="t-ok">&#34;&#34;&#34;&#34;&#34;&#34;&#34;&#34;</span>~~~<span class="t-hi">*</span>.........<span class="t-hi">@</span>..............~~~~~.....|
+160|....<span class="t-ok">&#34;&#34;&#34;&#34;&#34;&#34;&#34;&#34;&#34;</span>.~~~........|...<span class="t-ok">&#34;&#34;</span>........~~~~~~~....|
+180|....<span class="t-ok">&#34;&#34;&#34;&#34;&#34;&#34;&#34;&#34;&#34;</span>..~~~.......|.<span class="t-ok">&#34;&#34;&#34;&#34;&#34;&#34;</span>......~~~~~~~....|
+200|.....<span class="t-ok">&#34;&#34;&#34;&#34;&#34;&#34;&#34;</span>....~~~......|.<span class="t-ok">&#34;&#34;&#34;&#34;&#34;&#34;</span>.......<span class="t-hi">@</span>.~.......|
+220|....<span class="t-bad">+</span>.............~~~....|........................|
+240|--------------------~~~--<span class="t-hi">+</span>------------------------|
+260|..................<span class="t-hi">@</span>....~~~~.....<span class="t-gold">C</span>..<span class="t-bad">+</span>..............|
+280|.........................|~~~~~~~.................|
+300|...<span class="t-hi">^^^^*</span>..............<span class="t-gold">1n</span>.|......~~~~............<span class="t-hi">*</span>.|
+320|..<span class="t-hi">^^^^^^^^</span>...<span class="t-hi">@</span>........<span class="t-gold">nnn</span>|.........~~<span class="t-hi">*</span>............|
+340|..<span class="t-hi">^^^*^^^^</span>......<span class="t-hi">*</span>........|...........~~~~<span class="t-bad">%%%%%%%</span>..|
+360|..<span class="t-hi">^^^^^^^</span>......mm........|..<span class="t-gold">2</span>..........~<span class="t-hi">*</span>~<span class="t-bad">%%%%%%%</span>.|
+380|..............mm<span class="t-hi">*</span>m.......|.............<span class="t-bad">%%</span>~~~<span class="t-bad">%%%%</span><span class="t-hi">*</span>.|
+400|...............mm........|.....<span class="t-hi">@</span>.......<span class="t-bad">%%%%</span>~~<span class="t-bad">%%%%</span>.|
+420|........................,,,,,............<span class="t-bad">%%%</span>~~~...|
+440|.......................,,,,,,,................~~~.|
+460|.......o...............,,,,,,,..................~~|
+480|.........................|,.......................|
+   +--------------------------------------------------+
+    0        100       200       300       400      500
+<span class="t-fg">
+<span class="t-hi">@</span> в грі   <span class="t-dim">o</span> поза грою   <span class="t-gold">n</span> npc   <span class="t-bad">+</span> предмет   <span class="t-gold">1 2</span> точки квесту
+<span class="t-gold">C</span> столиця   <span class="t-hi">*</span> місце   <span class="t-dim">| -</span> межі частин королівства
+<span class="t-dim">~</span> вода   <span class="t-ok">"</span> ліс   <span class="t-hi">^</span> гори   <span class="t-dim">m</span> пагорби   <span class="t-bad">%</span> темні землі   <span class="t-dim">,</span> болото</span></pre>
+    </div>
+
+    <div>
+      <div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">idlerpg where</span></div>
+<pre class="ascii-table">
++----------------+------------+-----------------+----------+
+| <span class="t-hi">що</span>             | <span class="t-hi">де</span>         | <span class="t-hi">частина</span>         | <span class="t-hi">стан</span>     |
++----------------+------------+-----------------+----------+
+| <a href="/player/Paganel">Paganel</a>        | <span>[131, 331]</span> | <span>Південний Захід</span> | <span class="t-ok">online</span>   |
+| <a href="/player/gremax">gremax</a>         | <span>[402, 205]</span> | <span>Північний Схід</span>  | <span class="t-ok">online</span>   |
+| <a href="/player/ira">ira</a>            | <span>[250, 140]</span> | <span>Північний Схід</span>  | <span class="t-ok">online</span>   |
+| <a href="/player/nullbyte">nullbyte</a>       | <span>[77, 460]</span>  | <span>Південний Захід</span> | <span class="t-dim">offline</span>  |
+| <a href="/player/devnull">devnull</a>        | <span>[318, 418]</span> | <span>Південний Схід</span>  | <span class="t-ok">online</span>   |
+| <a href="/player/tim">tim</a>            | <span>[188, 260]</span> | <span>Південний Захід</span> | <span class="t-ok">online</span>   |
+| <a href="/player/Clamps">Clamps</a>         | <span>[232, 322]</span> | <span>Південний Захід</span> | <span class="t-ok">npc</span>      |
+| <a href="/player/Don">Don</a>            | <span>[241, 330]</span> | <span>Південний Захід</span> | <span class="t-ok">npc</span>      |
+| <a href="/player/Blotto">Blotto</a>         | <span>[228, 335]</span> | <span>Південний Захід</span> | <span class="t-ok">npc</span>      |
+| <a href="/player/TinnyTim">TinnyTim</a>       | <span>[236, 318]</span> | <span>Південний Захід</span> | <span class="t-ok">npc</span>      |
+| <span class="t-bad">щит 13</span>         | <span>[40, 220]</span>  | <span>Північний Захід</span> | <span>на землі</span> |
+| <span class="t-bad">каблучка 9</span>     | <span>[355, 260]</span> | <span>Південний Схід</span>  | <span>на землі</span> |
++----------------+------------+-----------------+----------+</pre>
+    </div>
+
+    <div>
+      <div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">idlerpg places</span></div>
+<pre class="ascii-table">
++----------------------------+------------+-----------------+
+| <span class="t-hi">місце</span>                      | <span class="t-hi">де</span>         | <span class="t-hi">частина</span>         |
++----------------------------+------------+-----------------+
+| <span class="t-gold">Столиця</span>                    | <span>[325, 270]</span> | <span>Південний Схід</span>  |
+| <span class="t-hi">Вежі Анкх-Аллора</span>           | <span>[225, 315]</span> | <span>Південний Захід</span> |
+| <span class="t-hi">лігво чаклуна Крука</span>        | <span>[280, 360]</span> | <span>Південний Схід</span>  |
+| <span class="t-hi">темні землі Т&#39;рнальвфа</span>     | <span>[400, 375]</span> | <span>Південний Схід</span>  |
+| <span class="t-hi">темні землі Т&#39;рнальвфа</span>     | <span>[480, 380]</span> | <span>Південний Схід</span>  |
+| <span class="t-hi">троль Докт&#39;р Вііі</span>          | <span>[290, 65]</span>  | <span>Північний Схід</span>  |
+| <span class="t-hi">місто Вельврах</span>             | <span>[480, 315]</span> | <span>Південний Схід</span>  |
+| <span class="t-hi">таємний хід до Бхараша</span>     | <span>[70, 315]</span>  | <span>Південний Захід</span> |
+| <span class="t-hi">Великі гори Шахліль</span>        | <span>[50, 350]</span>  | <span>Південний Захід</span> |
+| <span class="t-hi">лігво Грабтула</span>             | <span>[167, 358]</span> | <span>Південний Захід</span> |
+| <span class="t-hi">вовчі пагорби</span>              | <span>[160, 380]</span> | <span>Південний Захід</span> |
+| <span class="t-hi">табір армії Данії</span>          | <span>[35, 40]</span>   | <span>Північний Захід</span> |
+| <span class="t-hi">перевал</span>                    | <span>[235, 125]</span> | <span>Північний Захід</span> |
+| <span class="t-hi">країна Квок</span>                | <span>[430, 60]</span>  | <span>Північний Схід</span>  |
+| <span class="t-hi">плем&#39;я Джоу Ботзі</span>          | <span>[155, 155]</span> | <span>Північний Захід</span> |
+| <span class="t-hi">зомбі Джоу Ботзі</span>           | <span>[70, 125]</span>  | <span>Північний Захід</span> |
+| <span class="t-hi">зомбі Джоу Ботзі</span>           | <span>[170, 100]</span> | <span>Північний Захід</span> |
+| <span class="t-hi">архів логів</span>                | <span>[370, 325]</span> | <span>Південний Схід</span>  |
+| <span class="t-hi">архів логів</span>                | <span>[270, 130]</span> | <span>Північний Схід</span>  |
+| <span class="t-hi">комп&#39;ютер старого адміна</span>   | <span>[155, 40]</span>  | <span>Північний Захід</span> |
+| <span class="t-hi">комп&#39;ютер старого адміна</span>   | <span>[325, 130]</span> | <span>Північний Схід</span>  |
++----------------------------+------------+-----------------+</pre>
+    </div>
+
+    <div class="prompt"><b>guest@rpg</b>:~$ <span class="cursor"></span></div>
+  </div>
+</div>
+
+<div class="toast" role="status" hidden></div>
+</body>
+</html>

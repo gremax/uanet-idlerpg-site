@@ -169,7 +169,7 @@ var staticHash = regexp.MustCompile(`\.[0-9a-f]{10}\.`)
 // check the diff before committing.
 func TestPages(t *testing.T) {
 	s := site(t)
-	pages := map[string]string{"index": "/", "players": "/players"}
+	pages := map[string]string{"index": "/", "players": "/players", "map": "/map"}
 	for _, variant := range []string{"type2", "type1", "noquest", "stale", "nodata"} {
 		var g *Game
 		if variant != "nodata" {

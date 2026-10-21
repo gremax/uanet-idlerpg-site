@@ -1,0 +1,71 @@
+{{define "title"}}Мапа · IdleRPG{{end}}
+
+{{define "nodata"}}Дані гри зараз недоступні, тож на мапі тільки місцевість.{{end}}
+
+{{define "paper"}}
+    <section class="container section">
+      <h1>Мапа світу</h1>
+      <p class="lede page-intro">Світ 500 × 500. Персонажі блукають самі, підбирають предмети з землі й зустрічаються в бою. Натисніть на гравця, щоб відкрити профіль.</p>
+      <div class="map-layout">
+        <div class="box padded map-frame">
+          <svg viewBox="0 0 500 500" role="img" aria-label="Мапа світу 500 на 500">
+{{.Data.Terrain.Land}}{{.Data.Terrain.Labels}}{{.Data.Terrain.Places}}{{.Data.Markers}}
+          </svg>
+        </div>
+        <div class="box padded">
+          <h3>Позначки</h3>
+          <ul class="legend">
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#2338ff" stroke="#14123a" stroke-width="2.5"/></svg><span>гравець у грі{{with .Game}} ({{.OnlineHumans}}){{end}}</span></li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fffdf5" stroke="#14123a" stroke-width="2.5" stroke-dasharray="3 2"/></svg>гравець поза грою</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#ffd43b" stroke="#14123a" stroke-width="2.5"/></svg>мешканець світу (NPC)</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="4" width="12" height="12" transform="rotate(45 10 10)" fill="#ff6fae" stroke="#14123a" stroke-width="2"/></svg>предмет на землі</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path transform="translate(10 11)" d="M0 -9 L2.6 -3 9 -2.8 4 1.4 5.6 7.6 0 4.2 -5.6 7.6 -4 1.4 -9 -2.8 -2.6 -3Z" fill="#ffd43b" stroke="#14123a" stroke-width="1.6"/></svg>точка квесту</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="none" stroke="#ff6fae" stroke-width="2.5"/></svg>учасник квесту</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.2" fill="#14123a"/><circle cx="10" cy="10" r="6" fill="none" stroke="#14123a" stroke-width="1.2"/></svg>місце з квестів</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17 V9 h3 v2 h3 v-2 h2 v2 h3 v-2 h3 V17Z" fill="#ffd43b" stroke="#14123a" stroke-width="1.6" stroke-linejoin="round"/></svg>столиця</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1 V19 M1 10 H19" stroke="#14123a" stroke-opacity=".5" stroke-width="2" stroke-dasharray="4 2"/></svg>межі частин королівства</li>
+          </ul>
+          <p class="note legend-note">Королівство ділиться на чотири частини по x = 250 і y = 250. Північ угорі. За цими частинами бот проводить війни.</p>
+          {{- with .Game}}
+          <div>
+            <h3 class="ground-heading">На землі</h3>
+            {{- with .MapItems}}
+            <ul class="ground-items">
+              {{- range .}}
+              <li><span>{{slotName .Type}}, рівень {{.Level}}</span> <code>{{at .X .Y}}</code></li>
+              {{- end}}
+            </ul>
+            {{- else}}
+            <p class="note">Нічого не лежить.</p>
+            {{- end}}
+          </div>
+          {{- end}}
+        </div>
+      </div>
+    </section>
+{{end}}
+
+{{define "term"}}
+    {{- with .Game}}
+    <div>
+      {{template "prompt" "idlerpg map"}}
+<pre class="ascii-map">{{$.Data.ASCII}}
+<span class="t-fg">
+<span class="t-hi">@</span> в грі   <span class="t-dim">o</span> поза грою   <span class="t-gold">n</span> npc   <span class="t-bad">+</span> предмет   <span class="t-gold">1 2</span> точки квесту
+<span class="t-gold">C</span> столиця   <span class="t-hi">*</span> місце   <span class="t-dim">| -</span> межі частин королівства
+<span class="t-dim">~</span> вода   <span class="t-ok">"</span> ліс   <span class="t-hi">^</span> гори   <span class="t-dim">m</span> пагорби   <span class="t-bad">%</span> темні землі   <span class="t-dim">,</span> болото</span></pre>
+    </div>
+
+    <div>
+      {{template "prompt" "idlerpg where"}}
+<pre class="ascii-table">
+{{$.Data.Where}}</pre>
+    </div>
+
+    <div>
+      {{template "prompt" "idlerpg places"}}
+<pre class="ascii-table">
+{{$.Data.Places}}</pre>
+    </div>
+    {{- end}}
+{{end}}
