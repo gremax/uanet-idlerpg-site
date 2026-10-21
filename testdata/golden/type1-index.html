@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IdleRPG на UAnet</title>
+<meta name="description" content="IdleRPG на UAnet: гра в IRC-каналі #idlerpg, де рівні ростуть, поки ви нічого не робите.">
+<meta name="theme-color" content="#fffdf5">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='11' cy='16' r='9' fill='%23ffd43b'/%3E%3Ccircle cx='21' cy='16' r='9' fill='%232338ff'/%3E%3C/svg%3E">
+<link rel="preload" href="/static/fonts/unbounded-900.d31b185de5.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/fixel-text-var.31bbb33e57.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/style.72fba3c661.css">
+<script>try{if(localStorage.getItem('rpg-mode')==='term')document.documentElement.dataset.mode='term'}catch(e){}</script>
+<script src="/static/app.e01b5b606b.js" defer></script>
+</head>
+<body>
+
+<div class="paper-view">
+  <header class="site-header">
+    <div class="container site-nav">
+      <a class="logo" href="/"><i></i><span>UAnet</span><b>IdleRPG</b></a>
+      <nav class="tabs" aria-label="Розділи">
+        <a href="/" aria-current="page">Головна</a>
+        <a href="/players">Гравці</a>
+        <a href="/map">Мапа</a>
+        <a href="/quest">Квест</a>
+      </nav>
+      <span class="updated">оновлено 04:45 · 2 хв тому</span>
+      <button class="olds-btn" type="button" data-mode-toggle hidden>&gt;_ Для олдів</button>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="container section">
+      <div class="hero">
+        <div>
+          <h1>Гра, де виграє той, хто <span class="circ">нічого<svg viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true"><path d="M150 8C110-2 30 2 10 30c-14 22 30 44 96 42 60-2 100-20 88-44C186 10 140 4 96 8" fill="none" stroke="#ff6fae" stroke-width="5" stroke-linecap="round"/></svg></span> не робить.</h1>
+          <p class="lede">IdleRPG — рольова гра в IRC-каналі <b>#idlerpg</b> на UAnet. Рівні ростуть, поки ви мовчите. Бот сам проводить бої, дарує предмети, насилає лиха й квести. Грають в IRC, а тут видно, як воно йде.</p>
+        </div>
+        <dl class="box padded stats">
+          <div><dt>У грі зараз</dt><dd class="num">5 з 6</dd></div>
+          <div><dt>Лідер</dt><dd><a href="/player/gremax">gremax</a>, рівень 24</dd></div>
+          <div><dt>Мешканці світу</dt><dd class="num">4 NPC</dd></div>
+          <div><dt>Квест</dt><dd><a href="/quest">триває</a></dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="container teaser">
+      <a class="quest-teaser" href="/quest"><b>Квест: знайти томи пророка</b><span class="teaser-action">Дивитись квест →</span></a>
+    </section>
+
+    <section class="how">
+      <div class="container section">
+        <h2>Як почати</h2>
+        <ol class="steps">
+          <li class="box step">
+            <span class="step-number">1</span>
+            <h3>Зайдіть на UAnet</h3>
+            <p>Будь-яким IRC-клієнтом на <b>irc.uanet.net</b>, порт 6697, або через <a href="https://chat.uanet.net">веб-чат</a>.</p>
+          </li>
+          <li class="box step">
+            <span class="step-number">2</span>
+            <h3>Приєднайтесь до каналу</h3>
+            <div class="command"><code>/join #idlerpg</code><button class="copy" type="button" data-copy="/join #idlerpg" hidden>Копіювати</button></div>
+          </li>
+          <li class="box step">
+            <span class="step-number">3</span>
+            <h3>Зареєструйтесь</h3>
+            <p>Ім'я персонажа, пароль і клас. Клас — будь-який текст.</p>
+            <div class="command"><code>/msg IdleRPG REGISTER &lt;ім'я&gt; &lt;пароль&gt; &lt;клас&gt;</code><button class="copy" type="button" data-copy="/msg IdleRPG REGISTER " hidden>Копіювати</button></div>
+          </li>
+        </ol>
+        <p class="note">Далі нічого не робіть. Просто лишайтеся в каналі, і персонаж росте сам.</p>
+      </div>
+    </section>
+
+    <section class="container section">
+      <h2>За що штраф</h2>
+      <p class="lede section-intro">Будь-яка активність у каналі додає час до наступного рівня. Штраф множиться на 1,14 у степені вашого рівня, тож що вищий рівень, то дорожче балакати.</p>
+      <div class="penalty-cards">
+        <div class="box"><b>Репліка в каналі</b><code>довжина повідомлення × 1,14^рівень</code></div>
+        <div class="box"><b>Зміна ніку</b><code>30 с × 1,14^рівень</code></div>
+        <div class="box"><b>Вихід з каналу</b><code>200 с × 1,14^рівень</code></div>
+        <div class="box"><b>Кік</b><code>250 с × 1,14^рівень</code></div>
+        <div class="box"><b>Quit</b><code>20 с × 1,14^рівень</code></div>
+        <div class="box"><b>LOGOUT</b><code>20 с × 1,14^рівень</code></div>
+        <div class="box"><b>Провал квесту</b><code>штраф отримують усі в грі</code></div>
+      </div>
+    </section>
+
+    <section class="container section flush-top">
+      <h2>Що відбувається</h2>
+      <ul class="box events">
+        <li><time datetime="2026-10-21T01:31:02Z" title="21 жовтня 2026 р. о 04:31">04:31</time><span><a href="/player/Paganel">Paganel</a> стоїть у черзі в ЦНАП не до того віконця. Це лихо відкидає <a href="/player/Paganel">Paganel</a> на 0 днів, 00:00:10 від рівня 21.</span></li>
+        <li><time datetime="2026-10-21T01:30:40Z" title="21 жовтня 2026 р. о 04:30">04:30</time><span><a href="/player/gremax">gremax</a> і <a href="/player/TinnyTim">TinnyTim</a> не дають беззаконню лихих людей отруїти себе. Разом вони моляться своєму богові, і його світло сяє на них. Їхні таймери скорочено на 6%.</span></li>
+        <li><time datetime="2026-10-21T01:22:15Z" title="21 жовтня 2026 р. о 04:22">04:22</time><span><a href="/player/devnull">devnull</a> [118/131] викликав <a href="/player/ira">ira</a> [176/183] на бій і програв! Таймер <a href="/player/devnull">devnull</a> зріс на 0 днів, 00:09:12.</span></li>
+        <li><time datetime="2026-10-21T01:05:48Z" title="21 жовтня 2026 р. о 04:05">04:05</time><span><a href="/player/ira">ira</a> знайшла на дорозі туніку 21 рівня! Її старий предмет був 17 рівня, тож вона одягає нову.</span></li>
+        <li><time datetime="2026-10-21T00:47:03Z" title="21 жовтня 2026 р. о 03:47">03:47</time><span><a href="/player/Don">Don</a>, <a href="/player/Clamps">Clamps</a>, <a href="/player/Blotto">Blotto</a> і <a href="/player/TinnyTim">TinnyTim</a> вирушили спопелити Вежі Анкх-Аллора, де живе страшний чаклун Крук. Спершу їм треба дійти до [225, 315].</span></li>
+        <li><time datetime="2026-10-21T00:12:30Z" title="21 жовтня 2026 р. о 03:12">03:12</time><span><a href="/player/gremax">gremax</a> досяг рівня 24! Наступний рівень через 0 днів, 07:12:40.</span></li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><span>irc.uanet.net · #idlerpg</span><a href="https://uanet.net">uanet.net</a></div>
+  </footer>
+</div>
+
+<div class="term-view">
+  <div class="container term-screen">
+    <nav class="term-nav" aria-label="Розділи">
+      <a href="/" aria-current="page">[1] main</a>
+      <a href="/players">[2] players</a>
+      <a href="/map">[3] map</a>
+      <a href="/quest">[4] quest</a>
+      <span class="updated">оновлено 04:45 · 2 хв тому</span>
+      <button type="button" data-mode-toggle hidden>[ для нових ]</button>
+    </nav>
+
+<pre class="ascii-logo" aria-label="IdleRPG">
+    ____    ____     ____  ____  ______
+   /  _/___/ / /__  / __ \/ __ \/ ____/
+   / // __  / / _ \/ /_/ / /_/ / / __
+ _/ // /_/ / /  __/ _, _/ ____/ /_/ /
+/___/\__,_/_/\___/_/ |_/_/    \____/</pre>
+
+    <div>
+      <div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">cat /etc/motd</span></div>
+<pre class="wrapped">
+IdleRPG на UAnet. Рівні ростуть, поки ви мовчите.
+Бот сам проводить бої, дарує предмети, насилає лиха й квести.
+
+<span class="t-dim">гравців:</span> <span class="t-hi">6</span>   <span class="t-dim">у грі:</span> <span class="t-hi">5</span>   <span class="t-dim">npc:</span> <span class="t-hi">4</span>   <span class="t-dim">квест:</span> <a href="/quest">так</a></pre>
+    </div>
+
+    <div>
+      <div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">help</span></div>
+<pre class="wrapped">
+<span class="t-dim"># irc.uanet.net:6697 (tls)</span>
+<span class="t-hi">/join #idlerpg</span>
+<span class="t-hi">/msg IdleRPG REGISTER &lt;ім'я&gt; &lt;пароль&gt; &lt;клас&gt;</span>
+<span class="t-dim"># далі нічого не робіть</span></pre>
+    </div>
+
+    <div>
+      <div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">cat penalties.txt</span></div>
+<pre class="ascii-table">
++------------------+--------------------------------+
+| <span class="t-hi">дія</span>              | <span class="t-hi">штраф</span>                          |
++------------------+--------------------------------+
+| <span class="t-fg">репліка</span>          | <span class="t-fg">довжина × 1.14^рівень</span>          |
+| <span class="t-fg">зміна ніку</span>       | <span class="t-fg">30с × 1.14^рівень</span>              |
+| <span class="t-fg">вихід з каналу</span>   | <span class="t-fg">200с × 1.14^рівень</span>             |
+| <span class="t-fg">кік</span>              | <span class="t-fg">250с × 1.14^рівень</span>             |
+| <span class="t-fg">quit</span>             | <span class="t-fg">20с × 1.14^рівень</span>              |
+| <span class="t-fg">logout</span>           | <span class="t-fg">20с × 1.14^рівень</span>              |
+| <span class="t-fg">провал квесту</span>    | <span class="t-bad">штраф усім у грі</span>               |
++------------------+--------------------------------+</pre>
+    </div>
+
+    <div>
+      <div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">tail -n 15 events.log</span></div>
+      <pre class="wrapped t-fg">
+<span class="t-dim">[<time datetime="2026-10-21T01:31:02Z" title="21 жовтня 2026 р. о 04:31">04:31</time>]</span> <a href="/player/Paganel">Paganel</a> стоїть у черзі в ЦНАП не до того віконця. Це лихо відкидає <a href="/player/Paganel">Paganel</a> на 0 днів, 00:00:10 від рівня 21.
+<span class="t-dim">[<time datetime="2026-10-21T01:30:40Z" title="21 жовтня 2026 р. о 04:30">04:30</time>]</span> <a href="/player/gremax">gremax</a> і <a href="/player/TinnyTim">TinnyTim</a> не дають беззаконню лихих людей отруїти себе. Разом вони моляться своєму богові, і його світло сяє на них. Їхні таймери скорочено на 6%.
+<span class="t-dim">[<time datetime="2026-10-21T01:22:15Z" title="21 жовтня 2026 р. о 04:22">04:22</time>]</span> <a href="/player/devnull">devnull</a> [118/131] викликав <a href="/player/ira">ira</a> [176/183] на бій і програв! Таймер <a href="/player/devnull">devnull</a> зріс на 0 днів, 00:09:12.
+<span class="t-dim">[<time datetime="2026-10-21T01:05:48Z" title="21 жовтня 2026 р. о 04:05">04:05</time>]</span> <a href="/player/ira">ira</a> знайшла на дорозі туніку 21 рівня! Її старий предмет був 17 рівня, тож вона одягає нову.
+<span class="t-dim">[<time datetime="2026-10-21T00:47:03Z" title="21 жовтня 2026 р. о 03:47">03:47</time>]</span> <a href="/player/Don">Don</a>, <a href="/player/Clamps">Clamps</a>, <a href="/player/Blotto">Blotto</a> і <a href="/player/TinnyTim">TinnyTim</a> вирушили спопелити Вежі Анкх-Аллора, де живе страшний чаклун Крук. Спершу їм треба дійти до [225, 315].
+<span class="t-dim">[<time datetime="2026-10-21T00:12:30Z" title="21 жовтня 2026 р. о 03:12">03:12</time>]</span> <a href="/player/gremax">gremax</a> досяг рівня 24! Наступний рівень через 0 днів, 07:12:40.</pre>
+    </div>
+
+    <div class="prompt"><b>guest@rpg</b>:~$ <span class="cursor"></span></div>
+  </div>
+</div>
+
+<div class="toast" role="status" hidden></div>
+</body>
+</html>

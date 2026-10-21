@@ -1,0 +1,131 @@
+{{define "nodata"}}Дані гри зараз недоступні, тож тут тільки правила.{{end}}
+
+{{define "paper"}}
+    <section class="container section">
+      <div class="hero">
+        <div>
+          <h1>Гра, де виграє той, хто <span class="circ">нічого<svg viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true"><path d="M150 8C110-2 30 2 10 30c-14 22 30 44 96 42 60-2 100-20 88-44C186 10 140 4 96 8" fill="none" stroke="#ff6fae" stroke-width="5" stroke-linecap="round"/></svg></span> не робить.</h1>
+          <p class="lede">IdleRPG — рольова гра в IRC-каналі <b>#idlerpg</b> на UAnet. Рівні ростуть, поки ви мовчите. Бот сам проводить бої, дарує предмети, насилає лиха й квести. Грають в IRC, а тут видно, як воно йде.</p>
+        </div>
+        {{- with .Game}}
+        <dl class="box padded stats">
+          <div><dt>У грі зараз</dt><dd class="num">{{.OnlineHumans}} з {{len .Humans}}</dd></div>
+          {{- with $.Data.Leader}}
+          <div><dt>Лідер</dt><dd><a href="{{playerURL .Name}}">{{.Name}}</a>, рівень {{.Level}}</dd></div>
+          {{- end}}
+          <div><dt>Мешканці світу</dt><dd class="num">{{len .NPCs}} NPC</dd></div>
+          <div><dt>Квест</dt><dd>{{if .Quest}}<a href="/quest">триває</a>{{else}}немає{{end}}</dd></div>
+        </dl>
+        {{- end}}
+      </div>
+    </section>
+    {{- with .Game}}{{with .Quest}}
+
+    <section class="container teaser">
+      <a class="quest-teaser" href="/quest"><b>Квест: {{.Text}}</b><span class="teaser-action">Дивитись квест →</span></a>
+    </section>
+    {{- end}}{{end}}
+
+    <section class="how">
+      <div class="container section">
+        <h2>Як почати</h2>
+        <ol class="steps">
+          <li class="box step">
+            <span class="step-number">1</span>
+            <h3>Зайдіть на UAnet</h3>
+            <p>Будь-яким IRC-клієнтом на <b>irc.uanet.net</b>, порт 6697, або через <a href="https://chat.uanet.net">веб-чат</a>.</p>
+          </li>
+          <li class="box step">
+            <span class="step-number">2</span>
+            <h3>Приєднайтесь до каналу</h3>
+            <div class="command"><code>/join #idlerpg</code><button class="copy" type="button" data-copy="/join #idlerpg" hidden>Копіювати</button></div>
+          </li>
+          <li class="box step">
+            <span class="step-number">3</span>
+            <h3>Зареєструйтесь</h3>
+            <p>Ім'я персонажа, пароль і клас. Клас — будь-який текст.</p>
+            <div class="command"><code>/msg IdleRPG REGISTER &lt;ім'я&gt; &lt;пароль&gt; &lt;клас&gt;</code><button class="copy" type="button" data-copy="/msg IdleRPG REGISTER " hidden>Копіювати</button></div>
+          </li>
+        </ol>
+        <p class="note">Далі нічого не робіть. Просто лишайтеся в каналі, і персонаж росте сам.</p>
+      </div>
+    </section>
+
+    <section class="container section">
+      <h2>За що штраф</h2>
+      <p class="lede section-intro">Будь-яка активність у каналі додає час до наступного рівня. Штраф множиться на 1,14 у степені вашого рівня, тож що вищий рівень, то дорожче балакати.</p>
+      <div class="penalty-cards">
+        <div class="box"><b>Репліка в каналі</b><code>довжина повідомлення × 1,14^рівень</code></div>
+        <div class="box"><b>Зміна ніку</b><code>30 с × 1,14^рівень</code></div>
+        <div class="box"><b>Вихід з каналу</b><code>200 с × 1,14^рівень</code></div>
+        <div class="box"><b>Кік</b><code>250 с × 1,14^рівень</code></div>
+        <div class="box"><b>Quit</b><code>20 с × 1,14^рівень</code></div>
+        <div class="box"><b>LOGOUT</b><code>20 с × 1,14^рівень</code></div>
+        <div class="box"><b>Провал квесту</b><code>штраф отримують усі в грі</code></div>
+      </div>
+    </section>
+    {{- if .Game}}
+
+    <section class="container section flush-top">
+      <h2>Що відбувається</h2>
+      {{- with .Data.Events}}
+      <ul class="box events">
+        {{- range .}}
+        <li>{{template "event-time" .}}<span>{{$.Linked .Text}}</span></li>
+        {{- end}}
+      </ul>
+      {{- else}}
+      <div class="box empty">Поки тихо. Події з’являться, щойно бот щось вигадає.</div>
+      {{- end}}
+    </section>
+    {{- end}}
+{{end}}
+
+{{define "term"}}
+<pre class="ascii-logo" aria-label="IdleRPG">
+    ____    ____     ____  ____  ______
+   /  _/___/ / /__  / __ \/ __ \/ ____/
+   / // __  / / _ \/ /_/ / /_/ / / __
+ _/ // /_/ / /  __/ _, _/ ____/ /_/ /
+/___/\__,_/_/\___/_/ |_/_/    \____/</pre>
+
+    <div>
+      {{template "prompt" "cat /etc/motd"}}
+<pre class="wrapped">
+IdleRPG на UAnet. Рівні ростуть, поки ви мовчите.
+Бот сам проводить бої, дарує предмети, насилає лиха й квести.
+{{- with .Game}}
+
+<span class="t-dim">гравців:</span> <span class="t-hi">{{len .Humans}}</span>   <span class="t-dim">у грі:</span> <span class="t-hi">{{.OnlineHumans}}</span>   <span class="t-dim">npc:</span> <span class="t-hi">{{len .NPCs}}</span>   <span class="t-dim">квест:</span> {{if .Quest}}<a href="/quest">так</a>{{else}}<span class="t-dim">немає</span>{{end}}
+{{- end}}</pre>
+    </div>
+
+    <div>
+      {{template "prompt" "help"}}
+<pre class="wrapped">
+<span class="t-dim"># irc.uanet.net:6697 (tls)</span>
+<span class="t-hi">/join #idlerpg</span>
+<span class="t-hi">/msg IdleRPG REGISTER &lt;ім'я&gt; &lt;пароль&gt; &lt;клас&gt;</span>
+<span class="t-dim"># далі нічого не робіть</span></pre>
+    </div>
+
+    <div>
+      {{template "prompt" "cat penalties.txt"}}
+<pre class="ascii-table">
+{{.Data.Penalties}}</pre>
+    </div>
+    {{- if .Game}}
+
+    <div>
+      {{template "prompt" "tail -n 15 events.log"}}
+      {{- with .Data.Events}}
+      <pre class="wrapped t-fg">
+{{- range .}}
+<span class="t-dim">[{{template "event-time" .}}]</span> {{$.Linked .Text}}
+{{- end}}</pre>
+      {{- else}}
+      <pre class="t-dim">(порожньо)</pre>
+      {{- end}}
+    </div>
+    {{- end}}
+{{end}}

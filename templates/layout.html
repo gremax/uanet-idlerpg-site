@@ -1,0 +1,79 @@
+{{define "layout" -}}
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{block "title" .}}IdleRPG на UAnet{{end}}</title>
+<meta name="description" content="IdleRPG на UAnet: гра в IRC-каналі #idlerpg, де рівні ростуть, поки ви нічого не робите.">
+<meta name="theme-color" content="#fffdf5">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='11' cy='16' r='9' fill='%23ffd43b'/%3E%3Ccircle cx='21' cy='16' r='9' fill='%232338ff'/%3E%3C/svg%3E">
+<link rel="preload" href="{{asset "fonts/unbounded-900.woff2"}}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{asset "fonts/fixel-text-var.woff2"}}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{asset "style.css"}}">
+<script>try{if(localStorage.getItem('rpg-mode')==='term')document.documentElement.dataset.mode='term'}catch(e){}</script>
+<script src="{{asset "app.js"}}" defer></script>
+</head>
+<body{{if .Stale}} data-stale{{end}}>
+
+<div class="paper-view">
+  <header class="site-header">
+    <div class="container site-nav">
+      <a class="logo" href="/"><i></i><span>UAnet</span><b>IdleRPG</b></a>
+      <nav class="tabs" aria-label="Розділи">
+        {{- range .Tabs}}
+        <a href="{{.URL}}"{{if eq .Name $.Name}} aria-current="page"{{end}}>{{.Paper}}</a>
+        {{- end}}
+      </nav>
+      {{- with .Game}}
+      <span class="updated{{if $.Stale}} is-stale{{end}}">{{template "updated" $}}</span>
+      {{- end}}
+      <button class="olds-btn" type="button" data-mode-toggle hidden>&gt;_ Для олдів</button>
+    </div>
+  </header>
+
+  <main>
+    {{- if not .Game}}
+    <div class="container notice"><div class="warn">{{block "nodata" .}}Дані гри зараз недоступні.{{end}} Грати можна й так: підключіться до irc.uanet.net (6697, TLS) і напишіть /join #idlerpg.</div></div>
+    {{- else if .Stale}}
+    <div class="container notice"><div class="warn">Дані гри не оновлювались {{elapsed .Age}}. Таймери рахують від моменту, коли ви відкрили сторінку.</div></div>
+    {{- end}}
+{{template "paper" .}}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><span>irc.uanet.net · #idlerpg</span><a href="https://uanet.net">uanet.net</a></div>
+  </footer>
+</div>
+
+<div class="term-view">
+  <div class="container term-screen">
+    <nav class="term-nav" aria-label="Розділи">
+      {{- range .Tabs}}
+      <a href="{{.URL}}"{{if eq .Name $.Name}} aria-current="page"{{end}}>{{.Term}}</a>
+      {{- end}}
+      {{- with .Game}}
+      <span class="updated{{if $.Stale}} is-stale{{end}}">{{template "updated" $}}</span>
+      {{- end}}
+      <button type="button" data-mode-toggle hidden>[ для нових ]</button>
+    </nav>
+    {{- if not .Game}}
+    <div class="t-bad">помилка: game.json зараз недоступний</div>
+    {{- else if .Stale}}
+    <div class="t-bad">!! game.json не оновлювався {{elapsed .Age}}. Таймери нижче рахують від моменту завантаження сторінки.</div>
+    {{- end}}
+{{template "term" .}}
+    <div class="prompt"><b>guest@rpg</b>:~$ <span class="cursor"></span></div>
+  </div>
+</div>
+
+<div class="toast" role="status" hidden></div>
+</body>
+</html>
+{{end}}
+
+{{define "updated"}}оновлено {{kyivTime .Game.Updated}} · {{if lt .Age.Seconds 60.0}}щойно{{else}}{{elapsed .Age}} тому{{end}}{{end}}
+
+{{define "prompt"}}<div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">{{.}}</span></div>{{end}}
+
+{{define "event-time"}}<time datetime="{{iso .Time}}" title="{{kyivDate .Time}}">{{kyivTime .Time}}</time>{{end}}

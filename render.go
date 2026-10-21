@@ -1,0 +1,430 @@
+package main
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"embed"
+	"encoding/hex"
+	"fmt"
+	"html"
+	"html/template"
+	"io/fs"
+	"path"
+	"regexp"
+	"slices"
+	"strings"
+	"time"
+	_ "time/tzdata" // the image has no zoneinfo
+	"unicode/utf8"
+)
+
+//go:embed templates static
+var files embed.FS
+
+// Site holds the parsed templates and the static files under their
+// content-hashed URLs.
+type Site struct {
+	pages  map[string]*template.Template
+	urls   map[string]string // static file name: its URL
+	assets map[string]asset  // URL: the file
+}
+
+type asset struct {
+	body []byte
+	typ  string
+}
+
+var types = map[string]string{
+	".css":   "text/css; charset=utf-8",
+	".js":    "text/javascript; charset=utf-8",
+	".woff2": "font/woff2",
+	".txt":   "text/plain; charset=utf-8",
+}
+
+func NewSite() (*Site, error) {
+	s := &Site{pages: map[string]*template.Template{}, urls: map[string]string{},
+		assets: map[string]asset{}}
+	if err := s.loadStatic(); err != nil {
+		return nil, err
+	}
+	layout, err := template.New("").Funcs(s.funcs()).ParseFS(files, "templates/layout.html")
+	if err != nil {
+		return nil, err
+	}
+	names, err := fs.Glob(files, "templates/*.html")
+	if err != nil {
+		return nil, err
+	}
+	for _, name := range names {
+		if name == "templates/layout.html" {
+			continue
+		}
+		t, err := template.Must(layout.Clone()).ParseFS(files, name)
+		if err != nil {
+			return nil, err
+		}
+		s.pages[strings.TrimSuffix(path.Base(name), ".html")] = t
+	}
+	return s, nil
+}
+
+var cssURL = regexp.MustCompile(`url\(([^)]+)\)`)
+
+// loadStatic gives every file in static/ a URL with a hash of its content,
+// /static/<name>.<hash>.<ext>, so it can be cached for good. The CSS refers to
+// the fonts by name, so they get their URLs first and the CSS is rewritten.
+func (s *Site) loadStatic() error {
+	var names []string
+	err := fs.WalkDir(files, "static", func(p string, d fs.DirEntry, err error) error {
+		if err == nil && !d.IsDir() {
+			names = append(names, strings.TrimPrefix(p, "static/"))
+		}
+		return err
+	})
+	if err != nil {
+		return err
+	}
+	// the stylesheet last, after the files it points at
+	slices.SortStableFunc(names, func(a, b string) int {
+		return boolInt(path.Ext(a) == ".css") - boolInt(path.Ext(b) == ".css")
+	})
+	for _, name := range names {
+		body, err := files.ReadFile("static/" + name)
+		if err != nil {
+			return err
+		}
+		if path.Ext(name) == ".css" {
+			var missing []string
+			body = cssURL.ReplaceAllFunc(body, func(m []byte) []byte {
+				ref := path.Join(path.Dir(name), string(cssURL.FindSubmatch(m)[1]))
+				if u, ok := s.urls[ref]; ok {
+					return []byte("url(" + u + ")")
+				}
+				missing = append(missing, ref)
+				return m
+			})
+			if missing != nil {
+				return fmt.Errorf("static/%s refers to missing %v", name, missing)
+			}
+		}
+		sum := sha256.Sum256(body)
+		ext := path.Ext(name)
+		u := "/static/" + strings.TrimSuffix(name, ext) + "." + hex.EncodeToString(sum[:5]) + ext
+		s.urls[name] = u
+		s.assets[u] = asset{body: body, typ: types[ext]}
+	}
+	return nil
+}
+
+func boolInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+func (s *Site) funcs() template.FuncMap {
+	return template.FuncMap{
+		"asset": func(name string) (string, error) {
+			if u, ok := s.urls[name]; ok {
+				return u, nil
+			}
+			return "", fmt.Errorf("no static file %s", name)
+		},
+		"duration":  duration,
+		"kyivTime":  kyivTime,
+		"kyivDate":  kyivDate,
+		"elapsed":   elapsed,
+		"playerURL": playerURL,
+		"iso":       func(t time.Time) string { return t.UTC().Format(time.RFC3339) },
+	}
+}
+
+// Page is what a page template gets.
+type Page struct {
+	Name string // the template, and the tab marked as current
+	Game *Game  // nil when public.json has not been read yet
+	Now  time.Time
+	Data any // what the page shows besides the game
+}
+
+func (p *Page) Stale() bool {
+	return p.Game != nil && p.Game.Stale(p.Now)
+}
+
+// Age is how long ago the bot wrote the game.
+func (p *Page) Age() time.Duration {
+	return p.Now.Sub(p.Game.Updated)
+}
+
+func (p *Page) Left(pl *Player) int64 {
+	return p.Game.Left(pl, p.Now)
+}
+
+// Linked is the text with every player's name made a link to their page.
+func (p *Page) Linked(text string) template.HTML {
+	return linkNames(text, p.Game.Players)
+}
+
+// Tabs are the sections in the header, in both views.
+type Tab struct{ Name, URL, Paper, Term string }
+
+var tabs = []Tab{
+	{"index", "/", "Головна", "[1] main"},
+	{"players", "/players", "Гравці", "[2] players"},
+	{"map", "/map", "Мапа", "[3] map"},
+	{"quest", "/quest", "Квест", "[4] quest"},
+}
+
+func (p *Page) Tabs() []Tab { return tabs }
+
+func (s *Site) Render(name string, p *Page) ([]byte, error) {
+	t, ok := s.pages[name]
+	if !ok {
+		return nil, fmt.Errorf("no page %s", name)
+	}
+	p.Name = name
+	var b bytes.Buffer
+	if err := t.ExecuteTemplate(&b, "layout", p); err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
+
+func playerURL(name string) string {
+	return "/player/" + pathEscape(name)
+}
+
+// pathEscape escapes a name for one path segment. url.PathEscape leaves
+// characters like [ ] | ^ alone that are fine in a path but that some
+// clients still escape, so names round-trip the same either way.
+func pathEscape(s string) string {
+	var b strings.Builder
+	for _, c := range []byte(s) {
+		if 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9' ||
+			c == '-' || c == '_' || c == '.' || c == '~' {
+			b.WriteByte(c)
+		} else {
+			fmt.Fprintf(&b, "%%%02X", c)
+		}
+	}
+	return b.String()
+}
+
+// isNick says whether c can be part of an IRC nick, so "ira" is not found
+// inside "irate".
+func isNick(c rune) bool {
+	return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9' ||
+		strings.ContainsRune("_-[]\\^{}|`", c)
+}
+
+func linkNames(text string, players []*Player) template.HTML {
+	names := make([]string, 0, len(players))
+	for _, p := range players {
+		if p.Name != "" {
+			names = append(names, p.Name)
+		}
+	}
+	// the longest first, so "Don" does not take the start of "Donna"
+	slices.SortFunc(names, func(a, b string) int { return len(b) - len(a) })
+	var b strings.Builder
+	last := 0
+	prev := rune(0)
+	for i, c := range text {
+		if i < last {
+			prev = c
+			continue
+		}
+		if !isNick(prev) {
+			for _, n := range names {
+				if !strings.HasPrefix(text[i:], n) {
+					continue
+				}
+				if next, _ := utf8.DecodeRuneInString(text[i+len(n):]); isNick(next) {
+					continue
+				}
+				b.WriteString(html.EscapeString(text[last:i]))
+				fmt.Fprintf(&b, `<a href="%s">%s</a>`, playerURL(n), html.EscapeString(n))
+				last = i + len(n)
+				break
+			}
+		}
+		prev = c
+	}
+	b.WriteString(html.EscapeString(text[last:]))
+	return template.HTML(b.String())
+}
+
+// plural picks the Ukrainian form for n: plural(5, "день", "дні", "днів").
+func plural(n int64, one, few, many string) string {
+	n %= 100
+	if n < 0 {
+		n = -n
+	}
+	switch {
+	case n > 10 && n < 20:
+		return many
+	case n%10 == 1:
+		return one
+	case n%10 >= 2 && n%10 <= 4:
+		return few
+	}
+	return many
+}
+
+// duration is "1 день, 02:03:04", the way the bot writes times.
+func duration(seconds int64) string {
+	s := max(0, seconds)
+	days := s / 86400
+	return fmt.Sprintf("%d %s, %02d:%02d:%02d", days, plural(days, "день", "дні", "днів"),
+		s%86400/3600, s%3600/60, s%60)
+}
+
+var kyiv = mustZone("Europe/Kyiv")
+
+func mustZone(name string) *time.Location {
+	l, err := time.LoadLocation(name)
+	if err != nil {
+		panic(err)
+	}
+	return l
+}
+
+// kyivTime is "04:45" in Kyiv.
+func kyivTime(t time.Time) string {
+	return t.In(kyiv).Format("15:04")
+}
+
+var months = [...]string{"січня", "лютого", "березня", "квітня", "травня", "червня",
+	"липня", "серпня", "вересня", "жовтня", "листопада", "грудня"}
+
+// kyivDate is "21 жовтня 2026 р. о 04:45" in Kyiv.
+func kyivDate(t time.Time) string {
+	t = t.In(kyiv)
+	return fmt.Sprintf("%d %s %d р. о %s", t.Day(), months[t.Month()-1], t.Year(), t.Format("15:04"))
+}
+
+// elapsed is "2 хв", "3 години" or "2 дні": how long, without the "тому".
+func elapsed(d time.Duration) string {
+	minutes := int64(max(0, d) / time.Minute)
+	if minutes < 60 {
+		return fmt.Sprintf("%d хв", minutes)
+	}
+	hours := minutes / 60
+	if hours < 48 {
+		return fmt.Sprintf("%d %s", hours, plural(hours, "годину", "години", "годин"))
+	}
+	days := hours / 24
+	return fmt.Sprintf("%d %s", days, plural(days, "день", "дні", "днів"))
+}
+
+// Cell is one cell of an ASCII table: text in a terminal colour class,
+// optionally a link.
+type Cell struct {
+	Text  string
+	Class string
+	URL   string
+	Right bool // pad on the left
+}
+
+// asciiTable draws a table the way a terminal program prints one:
+//
+//	+------+-----+
+//	| name | lvl |
+//	+------+-----+
+//	| ira  |  23 |
+//	+------+-----+
+//
+// Each column is as wide as widths says: longer text is cut with "…". The
+// frame is left to the colour of the <pre> around it.
+func asciiTable(widths []int, header []Cell, rows [][]Cell) template.HTML {
+	var b strings.Builder
+	rule := "+"
+	for _, w := range widths {
+		rule += strings.Repeat("-", w+2) + "+"
+	}
+	row := func(cells []Cell) {
+		b.WriteString("|")
+		for i, c := range cells {
+			text := fit(c.Text, widths[i])
+			pad := strings.Repeat(" ", widths[i]-utf8.RuneCountInString(text))
+			b.WriteString(" ")
+			if c.Right {
+				b.WriteString(pad)
+			}
+			// a link leaves the padding out, so only the text is underlined
+			class := ""
+			if c.Class != "" {
+				class = ` class="` + c.Class + `"`
+			}
+			if c.URL != "" {
+				fmt.Fprintf(&b, `<a%s href="%s">%s</a>`, class, html.EscapeString(c.URL), html.EscapeString(text))
+			} else {
+				fmt.Fprintf(&b, `<span%s>%s</span>`, class, html.EscapeString(text))
+			}
+			if !c.Right {
+				b.WriteString(pad)
+			}
+			b.WriteString(" |")
+		}
+		b.WriteString("\n")
+	}
+	b.WriteString(rule + "\n")
+	row(header)
+	b.WriteString(rule + "\n")
+	for _, r := range rows {
+		row(r)
+	}
+	b.WriteString(rule)
+	return template.HTML(b.String())
+}
+
+// fit cuts text to width characters, with "…" in place of the rest.
+func fit(text string, width int) string {
+	if utf8.RuneCountInString(text) <= width {
+		return text
+	}
+	r := []rune(text)
+	return string(r[:width-1]) + "…"
+}
+
+// eventsShown is how many of the latest events the home page lists.
+const eventsShown = 15
+
+type indexView struct {
+	Leader    *Player
+	Events    []Event
+	Penalties template.HTML
+}
+
+func indexData(p *Page) (any, bool) {
+	v := indexView{Penalties: penaltiesTable}
+	if g := p.Game; g != nil {
+		if len(g.Humans) > 0 {
+			v.Leader = g.Humans[0]
+		}
+		v.Events = g.Events[:min(len(g.Events), eventsShown)]
+	}
+	return v, true
+}
+
+var penaltiesTable = func() template.HTML {
+	rows := [][2]string{
+		{"репліка", "довжина × 1.14^рівень"},
+		{"зміна ніку", "30с × 1.14^рівень"},
+		{"вихід з каналу", "200с × 1.14^рівень"},
+		{"кік", "250с × 1.14^рівень"},
+		{"quit", "20с × 1.14^рівень"},
+		{"logout", "20с × 1.14^рівень"},
+		{"провал квесту", "штраф усім у грі"},
+	}
+	var cells [][]Cell
+	for i, r := range rows {
+		class := "t-fg"
+		if i == len(rows)-1 {
+			class = "t-bad"
+		}
+		cells = append(cells, []Cell{{Text: r[0], Class: "t-fg"}, {Text: r[1], Class: class}})
+	}
+	return asciiTable([]int{16, 30}, []Cell{{Text: "дія", Class: "t-hi"}, {Text: "штраф", Class: "t-hi"}}, cells)
+}()
