@@ -9,6 +9,7 @@ import (
 	"html"
 	"html/template"
 	"io/fs"
+	"net/http"
 	"path"
 	"regexp"
 	"slices"
@@ -141,6 +142,10 @@ func (s *Site) funcs() template.FuncMap {
 		"inc":       func(i int) int { return i + 1 },
 		"slotName":  slotName,
 		"at":        at,
+		"quarterOf": quarterOf,
+		// the terrain, without its labels, for the small map
+		"terrainLand":   func() template.HTML { return terrain.Land },
+		"terrainPlaces": func() template.HTML { return terrain.Places },
 	}
 }
 
@@ -415,7 +420,7 @@ type indexView struct {
 	Penalties template.HTML
 }
 
-func indexData(p *Page) (any, bool) {
+func indexData(p *Page, _ *http.Request) (any, bool) {
 	v := indexView{Penalties: penaltiesTable}
 	if g := p.Game; g != nil {
 		if len(g.Humans) > 0 {
@@ -516,7 +521,7 @@ type playersView struct {
 	Ranking, NPCs template.HTML // the terminal's tables
 }
 
-func playersData(p *Page) (any, bool) {
+func playersData(p *Page, _ *http.Request) (any, bool) {
 	g := p.Game
 	if g == nil {
 		return playersView{}, true
@@ -599,7 +604,7 @@ func at(x, y int) string { return fmt.Sprintf("[%d, %d]", x, y) }
 
 func everyone(*Player) bool { return true }
 
-func mapData(p *Page) (any, bool) {
+func mapData(p *Page, _ *http.Request) (any, bool) {
 	v := mapView{Terrain: terrain}
 	g := p.Game
 	if g == nil {
@@ -630,5 +635,108 @@ func mapData(p *Page) (any, bool) {
 		rows = append(rows, []Cell{{Text: pl.Name, Class: class}, {Text: at(pl.X, pl.Y)}, {Text: quarterOf(pl.X, pl.Y)}})
 	}
 	v.Places = asciiTable([]int{26, 10, 15}, heads("місце", "де", "частина"), rows)
+	return v, true
+}
+
+// uniques are the unique items by their letter in bot.pl. The names must
+// match the ones the bot announces, from its lang/uk.txt.
+var uniques = map[string]string{
+	"a": "Всевидюча Велика Корона Маттта",
+	"b": "Захисний Латний Обладунок Res0",
+	"c": "Штормовий Магічний Амулет Двіна",
+	"d": "Колосальний Меч Люті Йотуна",
+	"e": "Ціпок Сліпої Люті Дрдінка",
+	"f": "Чарівні Чоботи Прудкості Мрквіка",
+	"g": "Молот Тями Джеффа",
+	"h": "Сяйлива Каблучка Блиску Джульєтти",
+}
+
+func uniqueName(letter string) string {
+	if n, ok := uniques[letter]; ok {
+		return n
+	}
+	return "унікальний предмет «" + letter + "»"
+}
+
+// penaltyKinds are the kinds of penalty, in the order the pages list them.
+var penaltyKinds = [][2]string{
+	{"mesg", "репліки"},
+	{"nick", "зміна ніку"},
+	{"part", "вихід з каналу"},
+	{"kick", "кік"},
+	{"quit", "quit"},
+	{"quest", "провал квесту"},
+	{"logout", "logout"},
+}
+
+type item struct {
+	Name   string // of the slot
+	Level  int
+	Unique string // the unique item's name, if it is one
+}
+
+type penalty struct {
+	Name    string
+	Seconds int64
+}
+
+type playerView struct {
+	Wanted       string  // the name in the URL
+	Player       *Player // nil if there is none by that name
+	Rank         int
+	Items        []item
+	ItemSum      int
+	Penalties    []penalty
+	PenaltyTotal int64
+	Minimap      template.HTML
+	// the terminal's: the label of the timer, dotted out, and two tables
+	NextLabel                string
+	TermItems, TermPenalties template.HTML
+}
+
+func playerData(p *Page, r *http.Request) (any, bool) {
+	v := playerView{Wanted: r.PathValue("name")}
+	g := p.Game
+	if g == nil {
+		return v, true
+	}
+	if v.Player = g.Find(v.Wanted); v.Player == nil {
+		return v, false
+	}
+	pl := v.Player
+	v.Rank = g.Rank(pl)
+	var rows [][]Cell
+	for _, s := range slots {
+		it := item{Name: s[1], Level: pl.Items[s[0]]}
+		levelClass := "t-hi"
+		if letter := pl.Unique[s[0]]; letter != "" {
+			it.Unique = uniqueName(letter)
+			levelClass = "t-gold"
+		}
+		v.Items = append(v.Items, it)
+		v.ItemSum += it.Level
+		rows = append(rows, []Cell{{Text: it.Name}, {Text: fmt.Sprint(it.Level), Class: levelClass, Right: true},
+			{Text: it.Unique, Class: "t-gold"}})
+	}
+	rows = append(rows, []Cell{{Text: "сума", Class: "t-hi"}, {Text: fmt.Sprint(v.ItemSum), Class: "t-gold", Right: true}, {}})
+	v.TermItems = asciiTable([]int{9, 4, 34}, heads("слот", "рів", "унікальний"), rows)
+
+	rows = nil
+	for _, k := range penaltyKinds {
+		pen := penalty{Name: k[1], Seconds: pl.Penalties[k[0]]}
+		v.Penalties = append(v.Penalties, pen)
+		v.PenaltyTotal += pen.Seconds
+		class := "t-dim"
+		if pen.Seconds > 0 {
+			class = "t-bad"
+		}
+		rows = append(rows, []Cell{{Text: pen.Name}, {Text: duration(pen.Seconds), Class: class, Right: true}})
+	}
+	rows = append(rows, []Cell{{Text: "разом", Class: "t-hi"}, {Text: duration(v.PenaltyTotal), Class: "t-gold", Right: true}})
+	v.TermPenalties = asciiTable([]int{15, 18}, heads("тип", "час"), rows)
+
+	v.NextLabel = fmt.Sprintf("до рівня %d", pl.Level+1)
+	v.NextLabel += strings.Repeat(".", max(0, 20-utf8.RuneCountInString(v.NextLabel)))
+	v.Minimap = Markers{Small: true, Highlight: pl.Name}.SVG(g)
 	return v, true
 }

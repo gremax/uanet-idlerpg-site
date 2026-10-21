@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -168,23 +169,35 @@ var staticHash = regexp.MustCompile(`\.[0-9a-f]{10}\.`)
 // with testdata/golden/<variant>-<page>.html. go test -update rewrites them;
 // check the diff before committing.
 func TestPages(t *testing.T) {
+	type page struct {
+		name, path string
+		status     int
+	}
+	common := []page{{"index", "/", 200}, {"players", "/players", 200}, {"map", "/map", 200}}
+	// the pages that look the same in every variant, only in two
+	players := []page{{"player-Paganel", "/player/Paganel", 200}, {"player-Don", "/player/Don", 200},
+		{"player-missing", "/player/nobody", 404}}
 	s := site(t)
-	pages := map[string]string{"index": "/", "players": "/players", "map": "/map"}
 	for _, variant := range []string{"type2", "type1", "noquest", "stale", "nodata"} {
 		var g *Game
 		if variant != "nodata" {
 			g = load(t, variant)
 		}
+		pages := common
+		if variant == "type2" || variant == "nodata" {
+			pages = append(slices.Clone(common), players...)
+		}
 		h := s.Handler(func() *Game { return g }, func() time.Time { return now })
-		for page, path := range pages {
-			r := get(t, h, path)
+		for _, p := range pages {
+			r := get(t, h, p.path)
 			body, _ := io.ReadAll(r.Body)
+			// without the game, nobody can be told missing
+			if want := p.status; r.StatusCode != want && (g != nil || r.StatusCode != 200) {
+				t.Errorf("%s %s: %d, want %d", variant, p.path, r.StatusCode, want)
+			}
 			// so that a change to a static file doesn't change every page
 			body = staticHash.ReplaceAll(body, []byte(".HASH."))
-			if r.StatusCode != 200 {
-				t.Errorf("%s %s: %d", variant, path, r.StatusCode)
-			}
-			golden := filepath.Join("testdata", "golden", variant+"-"+page+".html")
+			golden := filepath.Join("testdata", "golden", variant+"-"+p.name+".html")
 			if *update {
 				if err := os.MkdirAll(filepath.Dir(golden), 0o755); err != nil {
 					t.Fatal(err)
@@ -199,8 +212,35 @@ func TestPages(t *testing.T) {
 				t.Fatal(err)
 			}
 			if !bytes.Equal(body, want) {
-				t.Errorf("%s %s differs from %s; go test -update rewrites it", variant, path, golden)
+				t.Errorf("%s %s differs from %s; go test -update rewrites it", variant, p.path, golden)
 			}
 		}
+	}
+}
+
+func TestPlayerURLs(t *testing.T) {
+	g, err := parseGame([]byte(`{"updated": "2026-10-21T01:45:00Z", "players": [
+		{"name": "Paganel", "level": 1}, {"name": "a/b [c]", "level": 2}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	h := site(t).Handler(func() *Game { return g }, func() time.Time { return now })
+	for path, want := range map[string]struct {
+		status int
+		text   string
+	}{
+		"/player/":                {404, "Не вказано ім’я гравця."},
+		"/player/paganel":         {200, "<h1>Paganel</h1>"},
+		"/player/a%2Fb%20%5Bc%5D": {200, "<h1>a/b [c]</h1>"},
+		"/player/%3Cscript%3E":    {404, "персонажа «&lt;script&gt;»"},
+	} {
+		r := get(t, h, path)
+		body, _ := io.ReadAll(r.Body)
+		if r.StatusCode != want.status || !strings.Contains(string(body), want.text) {
+			t.Errorf("%s: %d, want %d with %q", path, r.StatusCode, want.status, want.text)
+		}
+	}
+	if got := playerURL("a/b [c]"); got != "/player/a%2Fb%20%5Bc%5D" {
+		t.Errorf("the URL of a/b [c] is %s", got)
 	}
 }

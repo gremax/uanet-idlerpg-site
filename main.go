@@ -70,13 +70,13 @@ func main() {
 // returns.
 func (s *Site) Handler(game func() *Game, now func() time.Time) http.Handler {
 	mux := http.NewServeMux()
-	page := func(name string, data func(*Page) (any, bool)) http.HandlerFunc {
+	page := func(name string, data func(*Page, *http.Request) (any, bool)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			p := &Page{Game: game(), Now: now()}
 			status := http.StatusOK
 			if data != nil {
 				var found bool
-				if p.Data, found = data(p); !found {
+				if p.Data, found = data(p, r); !found {
 					status = http.StatusNotFound
 				}
 			}
@@ -86,6 +86,8 @@ func (s *Site) Handler(game func() *Game, now func() time.Time) http.Handler {
 	mux.HandleFunc("GET /{$}", page("index", indexData))
 	mux.HandleFunc("GET /players", page("players", playersData))
 	mux.HandleFunc("GET /map", page("map", mapData))
+	mux.HandleFunc("GET /player/{name}", page("player", playerData))
+	mux.HandleFunc("GET /player/{$}", page("player", playerData))
 	mux.HandleFunc("GET /static/", func(w http.ResponseWriter, r *http.Request) {
 		a, ok := s.assets[r.URL.Path]
 		if !ok {

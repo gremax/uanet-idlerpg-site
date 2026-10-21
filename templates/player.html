@@ -1,0 +1,112 @@
+{{define "title"}}{{with .Data.Player}}{{.Name}}{{else}}{{or $.Data.Wanted "Гравець"}}{{end}} · IdleRPG{{end}}
+
+{{define "nodata"}}Дані гри зараз недоступні, тож профілів не видно.{{end}}
+
+{{define "paper"}}
+    <section class="container section">
+      <a class="back" href="/players">← Усі гравці</a>
+      {{- if .Game}}
+      {{- with .Data.Player}}
+
+      <div class="profile">
+        <div>
+          <div class="profile-tags">
+            {{- if .NPC}}
+            <span class="chip npc">NPC · мешканець світу</span>
+            {{- else}}
+            <span class="chip rank-chip"><span>#{{$.Data.Rank}} у рейтингу</span></span>
+            {{- end}}
+            {{template "chips" .}}
+          </div>
+          <h1>{{.Name}}</h1>
+          <p class="lede section-intro">{{.Class}}, рівень {{.Level}}</p>
+          <div class="box padded countdown-box">
+            <span class="note">До рівня {{inc .Level}}{{if not .Online}} · таймер стоїть, поки гравець поза грою{{end}}</span>
+            <div class="big-countdown num"{{if .Online}} data-left="{{$.Left .}}"{{end}}>{{duration ($.Left .)}}</div>
+          </div>
+          <dl class="facts">
+            <div><dt>Рівень</dt><dd>{{.Level}}</dd></div>
+            <div><dt>Клас</dt><dd>{{.Class}}</dd></div>
+            <div><dt>Світогляд</dt><dd>{{.AlignmentName}}</dd></div>
+            <div><dt>Статус</dt><dd>{{if .Online}}в грі{{else}}поза грою{{end}}</dd></div>
+            <div><dt>Загальний простій</dt><dd>{{duration .Idled}}</dd></div>
+            <div><dt>Зареєстровано</dt><dd>{{kyivDate .Created}}</dd></div>
+            <div><dt>Частина королівства</dt><dd>{{quarterOf .X .Y}}</dd></div>
+          </dl>
+          <h2 class="items-heading">Предмети</h2>
+          <div class="items">
+            {{- range $.Data.Items}}
+            <div class="item{{if .Unique}} unique{{end}}"><small>{{.Name}}</small><b class="num">{{.Level}}</b>{{with .Unique}}<em>{{.}}</em>{{end}}</div>
+            {{- end}}
+          </div>
+          <p class="item-sum">Сума предметів: <b class="num">{{$.Data.ItemSum}}</b></p>
+        </div>
+        <aside class="profile-side">
+          <div class="box padded">
+            <h3>Штрафи</h3>
+            <table class="penalties">
+              <tbody>
+                {{- range $.Data.Penalties}}
+                <tr{{if not .Seconds}} class="zero"{{end}}><td>{{.Name}}</td><td>{{duration .Seconds}}</td></tr>
+                {{- end}}
+              </tbody>
+              <tbody><tr class="total"><td>Разом</td><td>{{duration $.Data.PenaltyTotal}}</td></tr></tbody>
+            </table>
+          </div>
+          <a class="box padded minimap" href="/map">
+            <h3>На мапі <span class="mono note">{{at .X .Y}}</span></h3>
+            <svg viewBox="0 0 500 500" role="img" aria-label="Мапа світу 500 на 500">
+{{terrainLand}}{{terrainPlaces}}{{$.Data.Minimap}}
+            </svg>
+          </a>
+        </aside>
+      </div>
+      {{- else}}
+
+      <h1>Гравця не знайдено</h1>
+      <p class="lede">{{with $.Data.Wanted}}У грі немає персонажа «{{.}}».{{else}}Не вказано ім’я гравця.{{end}} Подивіться <a href="/players">список гравців</a>.</p>
+      {{- end}}
+      {{- end}}
+    </section>
+{{end}}
+
+{{define "term"}}
+    {{- if .Game}}
+    {{- with .Data.Player}}
+    <div>
+      {{template "prompt" (print "idlerpg status " .Name)}}
+<pre class="t-fg">
+<span class="t-gold">STATUS</span>  <span class="t-hi">{{.Name}}</span>  {{if .NPC}}<span class="t-gold">[npc]</span>{{else}}<span class="t-dim">#{{$.Data.Rank}}</span>{{end}}
+
+  <span class="t-dim">рівень..............</span> <span class="t-hi">{{.Level}}</span>
+  <span class="t-dim">клас................</span> <span class="t-hi">{{.Class}}</span>
+  <span class="t-dim">світогляд...........</span> <span class="{{.AlignmentColour "t-hi"}}">{{.AlignmentName}}</span>
+  <span class="t-dim">статус..............</span> <span class="{{.StatusColour}}">{{.StatusWord}}</span>
+  <span class="t-dim">{{$.Data.NextLabel}}</span> <span class="t-hi"{{if .Online}} data-left="{{$.Left .}}"{{end}}>{{duration ($.Left .)}}</span>
+  <span class="t-dim">загальний простій...</span> <span class="t-hi">{{duration .Idled}}</span>
+  <span class="t-dim">зареєстровано.......</span> <span class="t-hi">{{kyivDate .Created}}</span>
+  <span class="t-dim">позиція.............</span> <span class="t-hi">{{at .X .Y}}</span>  <a href="/map">map</a>
+  <span class="t-dim">частина.............</span> <span class="t-hi">{{quarterOf .X .Y}}</span></pre>
+    </div>
+
+    <div>
+      {{template "prompt" (print "idlerpg items " .Name)}}
+<pre class="ascii-table">
+{{$.Data.TermItems}}</pre>
+    </div>
+
+    <div>
+      {{template "prompt" (print "idlerpg penalties " .Name)}}
+<pre class="ascii-table">
+{{$.Data.TermPenalties}}</pre>
+    </div>
+    {{- else}}
+    <div>
+      {{template "prompt" (print "idlerpg status " $.Data.Wanted)}}
+<pre class="t-fg">
+<span class="t-bad">помилка: гравця «{{$.Data.Wanted}}» не знайдено</span>
+список: <a href="/players">idlerpg top</a></pre>
+    </div>
+    {{- end}}
+    {{- end}}
+{{end}}
