@@ -22,7 +22,7 @@
       <a class="logo" href="/"><i></i><span>UAnet</span><b>IdleRPG</b></a>
       <nav class="tabs" aria-label="Розділи">
         {{- range .Tabs}}
-        <a href="{{.URL}}"{{if eq .Name $.Name}} aria-current="page"{{end}}>{{.Paper}}</a>
+        <a href="{{.URL}}"{{if eq .Name $.Tab}} aria-current="page"{{end}}>{{.Paper}}</a>
         {{- end}}
       </nav>
       {{- with .Game}}
@@ -50,7 +50,7 @@
   <div class="container term-screen">
     <nav class="term-nav" aria-label="Розділи">
       {{- range .Tabs}}
-      <a href="{{.URL}}"{{if eq .Name $.Name}} aria-current="page"{{end}}>{{.Term}}</a>
+      <a href="{{.URL}}"{{if eq .Name $.Tab}} aria-current="page"{{end}}>{{.Term}}</a>
       {{- end}}
       {{- with .Game}}
       <span class="updated{{if $.Stale}} is-stale{{end}}">{{template "updated" $}}</span>
@@ -75,5 +75,7 @@
 {{define "updated"}}оновлено {{kyivTime .Game.Updated}} · {{if lt .Age.Seconds 60.0}}щойно{{else}}{{elapsed .Age}} тому{{end}}{{end}}
 
 {{define "prompt"}}<div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">{{.}}</span></div>{{end}}
+
+{{define "chips"}}<span class="chip {{.AlignmentClass}}">{{.AlignmentShort}}</span><span class="chip {{if .Online}}online{{else}}offline{{end}}"><i class="dot"></i><span>{{if .Online}}в грі{{else}}поза грою{{end}}</span></span>{{end}}
 
 {{define "event-time"}}<time datetime="{{iso .Time}}" title="{{kyivDate .Time}}">{{kyivTime .Time}}</time>{{end}}

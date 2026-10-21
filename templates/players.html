@@ -1,0 +1,76 @@
+{{define "title"}}Гравці · IdleRPG{{end}}
+
+{{define "nodata"}}Дані гри зараз недоступні, тож рейтингу не видно.{{end}}
+
+{{define "paper"}}
+    <section class="container section">
+      <h1>Гравці</h1>
+      <p class="lede page-intro">Рейтинг за рівнем. При однаковому рівні вище той, кому менше лишилось до наступного.</p>
+      {{- with .Game}}
+      {{- if .Humans}}
+      <table class="ranking">
+        <thead><tr><th>#</th><th>Гравець</th><th>Рівень</th><th>Клас</th><th>До рівня</th><th>Світогляд · статус</th></tr></thead>
+        <tbody>
+          {{- range $i, $p := .Humans}}
+          <tr{{with podium (inc $i)}} class="{{.}}"{{end}}>
+            <td class="rank"><span class="medal">{{inc $i}}</span></td>
+            <td class="name"><a href="{{playerURL .Name}}">{{.Name}}</a></td>
+            <td class="level num">{{.Level}}</td>
+            <td class="player-class">{{.Class}}</td>
+            <td class="countdown num"{{if .Online}} data-left="{{$.Left .}}"{{end}}>{{duration ($.Left .)}}</td>
+            <td class="tags">{{template "chips" .}}</td>
+          </tr>
+          {{- end}}
+        </tbody>
+      </table>
+      {{- else}}
+      <div class="box empty">Поки нікого. Станьте першим: <code>/join #idlerpg</code></div>
+      {{- end}}
+      {{- end}}
+    </section>
+    {{- with .Game}}{{with .NPCs}}
+
+    <section class="container section flush-top">
+      <h2>Мешканці світу</h2>
+      <p class="lede section-intro">NPC-боти живуть у світі, поки гравців мало: б’ються, ходять у квести, потрапляють у халепи. У рейтинг не входять.</p>
+      <div class="npc-cards">
+        {{- range .}}
+        <div class="box npc-card">
+          {{- if .Stub}}
+          <b>{{.Name}}</b>
+          <span class="player-class">мешканець світу</span>
+          <div><span class="chip npc">NPC</span></div>
+          {{- else}}
+          <a href="{{playerURL .Name}}">{{.Name}}</a>
+          <span class="player-class">{{.Class}} · рівень {{.Level}}</span>
+          <div><span class="chip npc">NPC</span><span class="chip {{.AlignmentClass}}">{{.AlignmentShort}}</span></div>
+          {{- end}}
+        </div>
+        {{- end}}
+      </div>
+    </section>
+    {{- end}}{{end}}
+{{end}}
+
+{{define "term"}}
+    {{- with .Game}}
+    <div>
+      {{template "prompt" "idlerpg top"}}
+      {{- if .Humans}}
+<pre class="ascii-table">
+{{$.Data.Ranking}}</pre>
+      {{- else}}
+      <pre class="t-dim">(гравців немає)</pre>
+      {{- end}}
+    </div>
+    {{- if .NPCs}}
+
+    <div>
+      {{template "prompt" "idlerpg npc"}}
+<pre class="ascii-table">
+# мешканці світу, у рейтинг не входять
+{{$.Data.NPCs}}</pre>
+    </div>
+    {{- end}}
+    {{- end}}
+{{end}}

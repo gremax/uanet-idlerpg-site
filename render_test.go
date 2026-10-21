@@ -162,12 +162,14 @@ func TestGameJSON(t *testing.T) {
 	}
 }
 
+var staticHash = regexp.MustCompile(`\.[0-9a-f]{10}\.`)
+
 // TestPages renders each page for each variant in testdata and compares it
 // with testdata/golden/<variant>-<page>.html. go test -update rewrites them;
 // check the diff before committing.
 func TestPages(t *testing.T) {
 	s := site(t)
-	pages := map[string]string{"index": "/"}
+	pages := map[string]string{"index": "/", "players": "/players"}
 	for _, variant := range []string{"type2", "type1", "noquest", "stale", "nodata"} {
 		var g *Game
 		if variant != "nodata" {
@@ -177,6 +179,8 @@ func TestPages(t *testing.T) {
 		for page, path := range pages {
 			r := get(t, h, path)
 			body, _ := io.ReadAll(r.Body)
+			// so that a change to a static file doesn't change every page
+			body = staticHash.ReplaceAll(body, []byte(".HASH."))
 			if r.StatusCode != 200 {
 				t.Errorf("%s %s: %d", variant, path, r.StatusCode)
 			}

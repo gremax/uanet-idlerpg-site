@@ -137,6 +137,8 @@ func (s *Site) funcs() template.FuncMap {
 		"elapsed":   elapsed,
 		"playerURL": playerURL,
 		"iso":       func(t time.Time) string { return t.UTC().Format(time.RFC3339) },
+		"podium":    Podium,
+		"inc":       func(i int) int { return i + 1 },
 	}
 }
 
@@ -177,6 +179,14 @@ var tabs = []Tab{
 }
 
 func (p *Page) Tabs() []Tab { return tabs }
+
+// Tab is the tab marked as current: a player's page is under the players.
+func (p *Page) Tab() string {
+	if p.Name == "player" {
+		return "players"
+	}
+	return p.Name
+}
 
 func (s *Site) Render(name string, p *Page) ([]byte, error) {
 	t, ok := s.pages[name]
@@ -324,7 +334,8 @@ type Cell struct {
 	Text  string
 	Class string
 	URL   string
-	Right bool // pad on the left
+	Right bool   // pad on the left
+	Left  *int64 // a timer: the seconds left, which app.js counts down
 }
 
 // asciiTable draws a table the way a terminal program prints one:
@@ -348,24 +359,29 @@ func asciiTable(widths []int, header []Cell, rows [][]Cell) template.HTML {
 		for i, c := range cells {
 			text := fit(c.Text, widths[i])
 			pad := strings.Repeat(" ", widths[i]-utf8.RuneCountInString(text))
-			b.WriteString(" ")
-			if c.Right {
-				b.WriteString(pad)
-			}
-			// a link leaves the padding out, so only the text is underlined
 			class := ""
 			if c.Class != "" {
 				class = ` class="` + c.Class + `"`
 			}
-			if c.URL != "" {
-				fmt.Fprintf(&b, `<a%s href="%s">%s</a>`, class, html.EscapeString(c.URL), html.EscapeString(text))
+			var cell string
+			switch {
+			case c.Left != nil:
+				// the padding inside, for app.js to keep as the time changes
+				cell = fmt.Sprintf(`<span%s data-left="%d" data-width="%d">%s</span>`,
+					class, *c.Left, widths[i], html.EscapeString(text+pad))
+				pad = ""
+			case c.URL != "":
+				// the padding outside, so only the text is underlined
+				cell = fmt.Sprintf(`<a%s href="%s">%s</a>`, class, html.EscapeString(c.URL), html.EscapeString(text))
+			default:
+				cell = fmt.Sprintf(`<span%s>%s</span>`, class, html.EscapeString(text))
+			}
+			if c.Right {
+				cell = pad + cell
 			} else {
-				fmt.Fprintf(&b, `<span%s>%s</span>`, class, html.EscapeString(text))
+				cell += pad
 			}
-			if !c.Right {
-				b.WriteString(pad)
-			}
-			b.WriteString(" |")
+			b.WriteString(" " + cell + " |")
 		}
 		b.WriteString("\n")
 	}
@@ -426,5 +442,122 @@ var penaltiesTable = func() template.HTML {
 		}
 		cells = append(cells, []Cell{{Text: r[0], Class: "t-fg"}, {Text: r[1], Class: class}})
 	}
-	return asciiTable([]int{16, 30}, []Cell{{Text: "дія", Class: "t-hi"}, {Text: "штраф", Class: "t-hi"}}, cells)
+	return asciiTable([]int{16, 30}, heads("дія", "штраф"), cells)
 }()
+
+// alignments are the names of g, n and e: in full, short, and the chip's class.
+var alignments = map[string][3]string{
+	"g": {"добро", "добро", "good"},
+	"n": {"нейтральність", "нейтр.", "neutral"},
+	"e": {"зло", "зло", "evil"},
+}
+
+func (p *Player) alignment() [3]string {
+	if a, ok := alignments[p.Alignment]; ok {
+		return a
+	}
+	return [3]string{"?", "?", "neutral"}
+}
+
+func (p *Player) AlignmentName() string  { return p.alignment()[0] }
+func (p *Player) AlignmentShort() string { return p.alignment()[1] }
+func (p *Player) AlignmentClass() string { return p.alignment()[2] }
+
+// AlignmentColour is the terminal's colour for the alignment: good green,
+// evil red, else neutral.
+func (p *Player) AlignmentColour(neutral string) string {
+	switch p.Alignment {
+	case "g":
+		return "t-ok"
+	case "e":
+		return "t-bad"
+	}
+	return neutral
+}
+
+func (p *Player) StatusWord() string {
+	if p.Online {
+		return "online"
+	}
+	return "offline"
+}
+
+func (p *Player) StatusColour() string {
+	if p.Online {
+		return "t-ok"
+	}
+	return "t-dim"
+}
+
+// timer is a table cell counting down to the player's next level, or the
+// time standing still while they are offline.
+func (p *Page) timer(pl *Player, class string) Cell {
+	left := p.Left(pl)
+	c := Cell{Text: duration(left), Class: class}
+	if pl.Online {
+		c.Left = &left
+	}
+	return c
+}
+
+var podium = []string{"first", "second", "third"}
+
+// Podium is the class of the row for the rank, if it's one of the first three.
+func Podium(rank int) string {
+	if rank >= 1 && rank <= len(podium) {
+		return "podium " + podium[rank-1]
+	}
+	return ""
+}
+
+type playersView struct {
+	Ranking, NPCs template.HTML // the terminal's tables
+}
+
+func playersData(p *Page) (any, bool) {
+	g := p.Game
+	if g == nil {
+		return playersView{}, true
+	}
+	var v playersView
+	var rows [][]Cell
+	for i, pl := range g.Humans {
+		rank := Cell{Text: fmt.Sprint(i + 1), Class: "t-fg", Right: true}
+		if i < len(podium) {
+			rank.Class = "t-gold"
+		}
+		rows = append(rows, []Cell{rank,
+			{Text: pl.Name, URL: playerURL(pl.Name)},
+			{Text: fmt.Sprint(pl.Level), Class: "t-hi", Right: true},
+			{Text: pl.Class},
+			p.timer(pl, "t-fg"),
+			{Text: pl.AlignmentShort(), Class: pl.AlignmentColour("t-fg")},
+			{Text: pl.StatusWord(), Class: pl.StatusColour()},
+		})
+	}
+	v.Ranking = asciiTable([]int{3, 14, 3, 18, 18, 6, 7}, heads("#", "гравець", "рів", "клас", "до рівня", "світ.", "статус"), rows)
+	rows = nil
+	for _, pl := range g.NPCs {
+		if pl.Stub {
+			rows = append(rows, []Cell{{Text: pl.Name, Class: "t-gold"},
+				{Text: "-", Class: "t-fg"}, {Text: "-", Class: "t-fg"}, {Text: "-", Class: "t-fg"}})
+			continue
+		}
+		rows = append(rows, []Cell{{Text: pl.Name, URL: playerURL(pl.Name)},
+			{Text: fmt.Sprint(pl.Level), Class: "t-hi", Right: true},
+			{Text: pl.Class},
+			{Text: pl.StatusWord(), Class: pl.StatusColour()},
+		})
+	}
+	v.NPCs = asciiTable([]int{12, 3, 20, 7}, heads("npc", "рів", "клас", "статус"), rows)
+	return v, true
+}
+
+// heads are the header cells of a terminal table.
+func heads(names ...string) []Cell {
+	cells := make([]Cell, len(names))
+	for i, n := range names {
+		cells[i] = Cell{Text: n, Class: "t-hi"}
+	}
+	return cells
+}

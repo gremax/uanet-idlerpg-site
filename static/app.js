@@ -3,9 +3,10 @@
 // and a fresh copy of the page every minute.
 //
 // A timer is <span data-left="523">: the seconds left when the server made
-// the page. It counts from when the page arrived, by performance.now(), so
-// the visitor's clock doesn't matter. At zero it waits for the bot: the page
-// is fetched again every few seconds until the server has a new time.
+// the page (data-width="18" pads it in a terminal table). It counts from when
+// the page arrived, by performance.now(), so the visitor's clock doesn't
+// matter. At zero it waits for the bot: the page is fetched again every few
+// seconds until the server has a new time.
 'use strict';
 
 (() => {
@@ -41,7 +42,8 @@
     let zero = false;
     for (const el of document.querySelectorAll('[data-left]')) {
       const left = Number(el.dataset.left) - gone;
-      el.textContent = duration(left);
+      // a cell of a terminal table keeps its width
+      el.textContent = duration(left).padEnd(Number(el.dataset.width) || 0);
       if (left <= 0) zero = true;
     }
     return zero;

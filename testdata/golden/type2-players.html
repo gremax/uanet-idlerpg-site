@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Гравці · IdleRPG</title>
+<meta name="description" content="IdleRPG на UAnet: гра в IRC-каналі #idlerpg, де рівні ростуть, поки ви нічого не робите.">
+<meta name="theme-color" content="#fffdf5">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='11' cy='16' r='9' fill='%23ffd43b'/%3E%3Ccircle cx='21' cy='16' r='9' fill='%232338ff'/%3E%3C/svg%3E">
+<link rel="preload" href="/static/fonts/unbounded-900.HASH.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/fixel-text-var.HASH.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/style.HASH.css">
+<script>try{if(localStorage.getItem('rpg-mode')==='term')document.documentElement.dataset.mode='term'}catch(e){}</script>
+<script src="/static/app.HASH.js" defer></script>
+</head>
+<body>
+
+<div class="paper-view">
+  <header class="site-header">
+    <div class="container site-nav">
+      <a class="logo" href="/"><i></i><span>UAnet</span><b>IdleRPG</b></a>
+      <nav class="tabs" aria-label="Розділи">
+        <a href="/">Головна</a>
+        <a href="/players" aria-current="page">Гравці</a>
+        <a href="/map">Мапа</a>
+        <a href="/quest">Квест</a>
+      </nav>
+      <span class="updated">оновлено 04:45 · 2 хв тому</span>
+      <button class="olds-btn" type="button" data-mode-toggle hidden>&gt;_ Для олдів</button>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="container section">
+      <h1>Гравці</h1>
+      <p class="lede page-intro">Рейтинг за рівнем. При однаковому рівні вище той, кому менше лишилось до наступного.</p>
+      <table class="ranking">
+        <thead><tr><th>#</th><th>Гравець</th><th>Рівень</th><th>Клас</th><th>До рівня</th><th>Світогляд · статус</th></tr></thead>
+        <tbody>
+          <tr class="podium first">
+            <td class="rank"><span class="medal">1</span></td>
+            <td class="name"><a href="/player/gremax">gremax</a></td>
+            <td class="level num">24</td>
+            <td class="player-class">Сисадмін-некромант</td>
+            <td class="countdown num" data-left="4090">0 днів, 01:08:10</td>
+            <td class="tags"><span class="chip good">добро</span><span class="chip online"><i class="dot"></i><span>в грі</span></span></td>
+          </tr>
+          <tr class="podium second">
+            <td class="rank"><span class="medal">2</span></td>
+            <td class="name"><a href="/player/ira">ira</a></td>
+            <td class="level num">23</td>
+            <td class="player-class">Ельфійка-перекладачка</td>
+            <td class="countdown num" data-left="9755">0 днів, 02:42:35</td>
+            <td class="tags"><span class="chip good">добро</span><span class="chip online"><i class="dot"></i><span>в грі</span></span></td>
+          </tr>
+          <tr class="podium third">
+            <td class="rank"><span class="medal">3</span></td>
+            <td class="name"><a href="/player/Paganel">Paganel</a></td>
+            <td class="level num">21</td>
+            <td class="player-class">Гном-інженер</td>
+            <td class="countdown num" data-left="403">0 днів, 00:06:43</td>
+            <td class="tags"><span class="chip evil">зло</span><span class="chip online"><i class="dot"></i><span>в грі</span></span></td>
+          </tr>
+          <tr>
+            <td class="rank"><span class="medal">4</span></td>
+            <td class="name"><a href="/player/nullbyte">nullbyte</a></td>
+            <td class="level num">19</td>
+            <td class="player-class">Мандрівний пентестер</td>
+            <td class="countdown num">0 днів, 04:10:20</td>
+            <td class="tags"><span class="chip neutral">нейтр.</span><span class="chip offline"><i class="dot"></i><span>поза грою</span></span></td>
+          </tr>
+          <tr>
+            <td class="rank"><span class="medal">5</span></td>
+            <td class="name"><a href="/player/devnull">devnull</a></td>
+            <td class="level num">17</td>
+            <td class="player-class">Бард порожнечі</td>
+            <td class="countdown num" data-left="3180">0 днів, 00:53:00</td>
+            <td class="tags"><span class="chip evil">зло</span><span class="chip online"><i class="dot"></i><span>в грі</span></span></td>
+          </tr>
+          <tr>
+            <td class="rank"><span class="medal">6</span></td>
+            <td class="name"><a href="/player/tim">tim</a></td>
+            <td class="level num">6</td>
+            <td class="player-class">Новачок без класу</td>
+            <td class="countdown num" data-left="1170">0 днів, 00:19:30</td>
+            <td class="tags"><span class="chip neutral">нейтр.</span><span class="chip online"><i class="dot"></i><span>в грі</span></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="container section flush-top">
+      <h2>Мешканці світу</h2>
+      <p class="lede section-intro">NPC-боти живуть у світі, поки гравців мало: б’ються, ходять у квести, потрапляють у халепи. У рейтинг не входять.</p>
+      <div class="npc-cards">
+        <div class="box npc-card">
+          <a href="/player/Clamps">Clamps</a>
+          <span class="player-class">Механічний сторож · рівень 26</span>
+          <div><span class="chip npc">NPC</span><span class="chip neutral">нейтр.</span></div>
+        </div>
+        <div class="box npc-card">
+          <a href="/player/Don">Don</a>
+          <span class="player-class">Мандрівний торговець · рівень 20</span>
+          <div><span class="chip npc">NPC</span><span class="chip neutral">нейтр.</span></div>
+        </div>
+        <div class="box npc-card">
+          <a href="/player/Blotto">Blotto</a>
+          <span class="player-class">Корчмар · рівень 18</span>
+          <div><span class="chip npc">NPC</span><span class="chip good">добро</span></div>
+        </div>
+        <div class="box npc-card">
+          <a href="/player/TinnyTim">TinnyTim</a>
+          <span class="player-class">Бляшаний лицар · рівень 22</span>
+          <div><span class="chip npc">NPC</span><span class="chip good">добро</span></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><span>irc.uanet.net · #idlerpg</span><a href="https://uanet.net">uanet.net</a></div>
+  </footer>
+</div>
+
+<div class="term-view">
+  <div class="container term-screen">
+    <nav class="term-nav" aria-label="Розділи">
+      <a href="/">[1] main</a>
+      <a href="/players" aria-current="page">[2] players</a>
+      <a href="/map">[3] map</a>
+      <a href="/quest">[4] quest</a>
+      <span class="updated">оновлено 04:45 · 2 хв тому</span>
+      <button type="button" data-mode-toggle hidden>[ для нових ]</button>
+    </nav>
+
+    <div>
+      <div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">idlerpg top</span></div>
+<pre class="ascii-table">
++-----+----------------+-----+--------------------+--------------------+--------+---------+
+| <span class="t-hi">#</span>   | <span class="t-hi">гравець</span>        | <span class="t-hi">рів</span> | <span class="t-hi">клас</span>               | <span class="t-hi">до рівня</span>           | <span class="t-hi">світ.</span>  | <span class="t-hi">статус</span>  |
++-----+----------------+-----+--------------------+--------------------+--------+---------+
+|   <span class="t-gold">1</span> | <a href="/player/gremax">gremax</a>         |  <span class="t-hi">24</span> | <span>Сисадмін-некромант</span> | <span class="t-fg" data-left="4090" data-width="18">0 днів, 01:08:10  </span> | <span class="t-ok">добро</span>  | <span class="t-ok">online</span>  |
+|   <span class="t-gold">2</span> | <a href="/player/ira">ira</a>            |  <span class="t-hi">23</span> | <span>Ельфійка-переклад…</span> | <span class="t-fg" data-left="9755" data-width="18">0 днів, 02:42:35  </span> | <span class="t-ok">добро</span>  | <span class="t-ok">online</span>  |
+|   <span class="t-gold">3</span> | <a href="/player/Paganel">Paganel</a>        |  <span class="t-hi">21</span> | <span>Гном-інженер</span>       | <span class="t-fg" data-left="403" data-width="18">0 днів, 00:06:43  </span> | <span class="t-bad">зло</span>    | <span class="t-ok">online</span>  |
+|   <span class="t-fg">4</span> | <a href="/player/nullbyte">nullbyte</a>       |  <span class="t-hi">19</span> | <span>Мандрівний пентес…</span> | <span class="t-fg">0 днів, 04:10:20</span>   | <span class="t-fg">нейтр.</span> | <span class="t-dim">offline</span> |
+|   <span class="t-fg">5</span> | <a href="/player/devnull">devnull</a>        |  <span class="t-hi">17</span> | <span>Бард порожнечі</span>     | <span class="t-fg" data-left="3180" data-width="18">0 днів, 00:53:00  </span> | <span class="t-bad">зло</span>    | <span class="t-ok">online</span>  |
+|   <span class="t-fg">6</span> | <a href="/player/tim">tim</a>            |   <span class="t-hi">6</span> | <span>Новачок без класу</span>  | <span class="t-fg" data-left="1170" data-width="18">0 днів, 00:19:30  </span> | <span class="t-fg">нейтр.</span> | <span class="t-ok">online</span>  |
++-----+----------------+-----+--------------------+--------------------+--------+---------+</pre>
+    </div>
+
+    <div>
+      <div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">idlerpg npc</span></div>
+<pre class="ascii-table">
+# мешканці світу, у рейтинг не входять
++--------------+-----+----------------------+---------+
+| <span class="t-hi">npc</span>          | <span class="t-hi">рів</span> | <span class="t-hi">клас</span>                 | <span class="t-hi">статус</span>  |
++--------------+-----+----------------------+---------+
+| <a href="/player/Clamps">Clamps</a>       |  <span class="t-hi">26</span> | <span>Механічний сторож</span>    | <span class="t-ok">online</span>  |
+| <a href="/player/Don">Don</a>          |  <span class="t-hi">20</span> | <span>Мандрівний торговець</span> | <span class="t-ok">online</span>  |
+| <a href="/player/Blotto">Blotto</a>       |  <span class="t-hi">18</span> | <span>Корчмар</span>              | <span class="t-ok">online</span>  |
+| <a href="/player/TinnyTim">TinnyTim</a>     |  <span class="t-hi">22</span> | <span>Бляшаний лицар</span>       | <span class="t-ok">online</span>  |
++--------------+-----+----------------------+---------+</pre>
+    </div>
+
+    <div class="prompt"><b>guest@rpg</b>:~$ <span class="cursor"></span></div>
+  </div>
+</div>
+
+<div class="toast" role="status" hidden></div>
+</body>
+</html>
