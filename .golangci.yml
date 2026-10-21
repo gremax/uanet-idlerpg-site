@@ -1,0 +1,13 @@
+version: "2"
+
+linters:
+  settings:
+    errcheck:
+      # A write to the client fails only once it has gone, and then there is
+      # nothing left to do.
+      exclude-functions:
+        - (net/http.ResponseWriter).Write
+
+formatters:
+  enable:
+    - gofmt

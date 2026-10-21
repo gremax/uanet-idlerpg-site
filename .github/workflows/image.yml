@@ -23,12 +23,21 @@ jobs:
         uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
-      - name: Check the formatting
-        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
-      - name: Vet
-        run: go vet ./...
+      # gofmt, go vet, staticcheck and the rest, as set in .golangci.yml
+      - name: Lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.15.0
       - name: Run the tests
         run: go test ./...
+      # The golden pages are what the templates render, so the HTML checked is
+      # the HTML served. The validator publishes only a moving "latest", so its
+      # image is pinned by digest.
+      - name: Validate the HTML
+        run: >-
+          docker run --rm -v "$PWD/testdata/golden:/pages:ro"
+          ghcr.io/validator/validator@sha256:8f21030474e68e06905cfa801b37376e99c0e37867c653c5b6cd7e2dcaf3f503
+          vnu --errors-only /pages
   image:
     name: Build the image
     needs: test

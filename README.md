@@ -22,7 +22,15 @@ Routes: `/`, `/players`, `/player/{name}`, `/map`, `/quest`, `/game.json` (the
 file as read, 503 until there is one), `/healthz`, and `/static/`, where every
 URL carries a hash of the file and is cached as immutable.
 
-Checks: `gofmt -l .`, `go vet ./...`, `go test ./...`.
+Checks, as CI runs them: `golangci-lint run` (set up in `.golangci.yml`),
+`go test ./...`, and the [Nu HTML checker](https://validator.github.io/validator/)
+on the golden pages (see below), `vnu --errors-only testdata/golden`. Without
+the tools installed, Docker has both:
+
+```
+docker run --rm -v "$PWD:/app" -w /app golangci/golangci-lint:v2.15.0 golangci-lint run
+docker run --rm -v "$PWD/testdata/golden:/pages:ro" ghcr.io/validator/validator vnu --errors-only /pages
+```
 
 ## Pages
 
