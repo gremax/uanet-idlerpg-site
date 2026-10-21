@@ -1,0 +1,36 @@
+{{/* The game over the terrain of a paper map, from an Overlay. */}}
+{{define "markers"}}
+{{- with .Route}}
+<path stroke="#14123a" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round" d="M{{(index . 0).X}} {{(index . 0).Y}} L{{(index . 1).X}} {{(index . 1).Y}}"/>
+{{- range .}}
+<g class="map-quest-point{{if .Passed}} passed{{end}}" transform="translate({{.X}} {{.Y}})">
+  <title>Точка квесту {{.N}}: {{at .X .Y}}</title>
+  <path d="M0 -13 L3.8 -4.2 13 -4 5.8 2 8 11 0 6 -8 11 -5.8 2 -13 -4 -3.8 -4.2Z" stroke="#14123a" stroke-width="2" stroke-linejoin="round"/>
+  <text y="4" text-anchor="middle" font-family="Ubuntu Mono,monospace" font-weight="700" font-size="11" fill="#14123a">{{.N}}</text>
+</g>
+{{- end}}
+{{- end}}
+{{- range .Items}}
+<g transform="translate({{.X}} {{.Y}})">
+  <title>{{slotName .Type}}, рівень {{.Level}} {{at .X .Y}}</title>
+  <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#ff6fae" stroke="#14123a" stroke-width="2"/>
+</g>
+{{- end}}
+{{- range .Players}}
+{{if .Linked}}<a href="{{playerURL .Name}}">{{end}}
+<g class="map-player {{.Kind}}" transform="translate({{.X}} {{.Y}})">
+  <title>{{.Name}}{{if .NPC}} (NPC){{end}}, рівень {{.Level}}, {{if .Online}}в грі{{else}}поза грою{{end}} {{at .X .Y}}</title>
+  {{- if .Highlighted}}
+  <circle class="map-player-halo" r="18" fill="#ffd43b" fill-opacity=".45" stroke="#14123a" stroke-width="2" stroke-dasharray="3 4"/>
+  {{- end}}
+  <circle class="map-player-dot" stroke="#14123a" stroke-width="2.5" r="{{.Radius}}"/>
+  {{- if .Questing}}
+  <circle class="map-player-quest" fill="none" stroke="#ff6fae" stroke-width="2.5" r="{{.Ring}}"/>
+  {{- end}}
+  {{- if .Named}}
+  <text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="#14123a" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="{{.Ring}}" font-size="{{.FontSize}}">{{.Name}}</text>
+  {{- end}}
+</g>
+{{- if .Linked}}</a>{{end}}
+{{- end}}
+{{- end}}

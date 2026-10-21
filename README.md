@@ -26,18 +26,20 @@ Checks: `gofmt -l .`, `go vet ./...`, `go test ./...`.
 
 ## Pages
 
-`templates/` holds one layout and a template per page. Each page has its whole
+`templates/` holds one layout, a template per page, and in `partials/` the
+pieces several pages share, like the markers on the maps. Each page has its whole
 markup twice: the uanet.net look and, behind «>_ Для олдів», an amber terminal
 that prints the same as command output. `<html data-mode="term">` picks the
-terminal and the choice is kept in `localStorage`. The ASCII tables are built in
-`render.go`. Every page is complete without JavaScript.
+terminal and the choice is kept in `localStorage`. The ASCII tables and the
+terminal map are text laid out by width, so they are built in Go (`render.go`,
+`terrain.go`). Every page is complete without JavaScript.
 
 `static/app.js` is the only script. It counts the timers down from their
 `data-left` attributes, switches the look, copies the join commands and quietly
 fetches the page again every minute. When a timer reaches zero it shows
 `00:00:00` and asks again every 10 seconds until the bot writes the new level.
-A file older than 5 minutes is stale: the pages say so, the timers start from
-what the file says, and a timer at zero waits for the minutely fetch.
+A file older than 5 minutes is stale: the pages say so, and the timers to the
+next level stand at what the file says, since the bot isn't counting either.
 
 The map's terrain is made up and drawn at startup from the fixed seed 42 in
 `terrain.go`, so it is the same on every start. The four parts of the realm match

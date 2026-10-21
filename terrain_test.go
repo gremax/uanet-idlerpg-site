@@ -5,18 +5,6 @@ import (
 	"testing"
 )
 
-func TestF1(t *testing.T) {
-	// toFixed(1) rounds an exact tie up; 0.05 and 2.45 are not ties as doubles
-	for x, want := range map[float64]string{
-		0: "0.0", 2.25: "2.3", 2.35: "2.4", 0.05: "0.1", 2.45: "2.5", 2.449: "2.4",
-		123.04999: "123.0", 499.96: "500.0",
-	} {
-		if got := f1(x); got != want {
-			t.Errorf("f1(%v) = %q, want %q", x, got, want)
-		}
-	}
-}
-
 func TestRandom(t *testing.T) {
 	rand := random(42)
 	// Park–Miller from 42: 42 × 16807 = 705894

@@ -9,7 +9,7 @@
       <div class="map-layout">
         <div class="box padded map-frame">
           <svg viewBox="0 0 500 500" role="img" aria-label="Мапа світу 500 на 500">
-{{.Data.Terrain.Land}}{{.Data.Terrain.Labels}}{{.Data.Terrain.Places}}{{.Data.Markers}}
+{{.Data.Terrain.Land}}{{.Data.Terrain.Labels}}{{.Data.Terrain.Places}}{{template "markers" .Data.Markers}}
           </svg>
         </div>
         <div class="box padded">

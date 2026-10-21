@@ -219,6 +219,24 @@ func TestPages(t *testing.T) {
 	}
 }
 
+// TestStaleTimersStand: a timer counts down only while the bot writes the
+// file. On stale data every fetch would bring back the same time.
+func TestStaleTimersStand(t *testing.T) {
+	g := load(t, "type2")
+	h := site(t).Handler(func() *Game { return g }, func() time.Time { return now })
+	stale := site(t).Handler(func() *Game { return g }, func() time.Time { return now.Add(time.Hour) })
+	for _, path := range []string{"/players", "/player/Paganel"} {
+		body, _ := io.ReadAll(get(t, h, path).Body)
+		if !strings.Contains(string(body), "data-left=") {
+			t.Errorf("%s: no timer counts down", path)
+		}
+		body, _ = io.ReadAll(get(t, stale, path).Body)
+		if strings.Contains(string(body), "data-left=") {
+			t.Errorf("%s: a timer counts down on stale data", path)
+		}
+	}
+}
+
 func TestPlayerURLs(t *testing.T) {
 	g, err := parseGame([]byte(`{"updated": "2026-10-21T01:45:00Z", "players": [
 		{"name": "Paganel", "level": 1}, {"name": "a/b [c]", "level": 2}]}`))

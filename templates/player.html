@@ -22,7 +22,7 @@
           <p class="lede section-intro">{{.Class}}, рівень {{.Level}}</p>
           <div class="box padded countdown-box">
             <span class="note">До рівня {{inc .Level}}{{if not .Online}} · таймер стоїть, поки гравець поза грою{{end}}</span>
-            <div class="big-countdown num"{{if .Online}} data-left="{{$.Left .}}"{{end}}>{{duration ($.Left .)}}</div>
+            <div class="big-countdown num"{{if $.Ticking .}} data-left="{{$.Left .}}"{{end}}>{{duration ($.Left .)}}</div>
           </div>
           <dl class="facts">
             <div><dt>Рівень</dt><dd>{{.Level}}</dd></div>
@@ -56,7 +56,7 @@
           <a class="box padded minimap" href="/map">
             <h3>На мапі <span class="mono note">{{at .X .Y}}</span></h3>
             <svg viewBox="0 0 500 500" role="img" aria-label="Мапа світу 500 на 500">
-{{terrainLand}}{{terrainPlaces}}{{$.Data.Minimap}}
+{{terrainLand}}{{terrainPlaces}}{{template "markers" $.Data.Minimap}}
             </svg>
           </a>
         </aside>
@@ -82,7 +82,7 @@
   <span class="t-dim">клас................</span> <span class="t-hi">{{.Class}}</span>
   <span class="t-dim">світогляд...........</span> <span class="{{.AlignmentColour "t-hi"}}">{{.AlignmentName}}</span>
   <span class="t-dim">статус..............</span> <span class="{{.StatusColour}}">{{.StatusWord}}</span>
-  <span class="t-dim">{{$.Data.NextLabel}}</span> <span class="t-hi"{{if .Online}} data-left="{{$.Left .}}"{{end}}>{{duration ($.Left .)}}</span>
+  <span class="t-dim">{{$.Data.NextLabel}}</span> <span class="t-hi"{{if $.Ticking .}} data-left="{{$.Left .}}"{{end}}>{{duration ($.Left .)}}</span>
   <span class="t-dim">загальний простій...</span> <span class="t-hi">{{duration .Idled}}</span>
   <span class="t-dim">зареєстровано.......</span> <span class="t-hi">{{kyivDate .Created}}</span>
   <span class="t-dim">позиція.............</span> <span class="t-hi">{{at .X .Y}}</span>  <a href="/map">map</a>

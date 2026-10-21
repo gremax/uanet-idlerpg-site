@@ -5,8 +5,8 @@ import (
 	"html"
 	"html/template"
 	"math"
-	"math/big"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -176,18 +176,9 @@ func terrainAt(x, y float64) string {
 	return ""
 }
 
-// f1 is x with one decimal, rounding a tie up, as JavaScript's toFixed(1)
-// does, so the map is the one the mockup drew in JavaScript.
+// f1 is x with one decimal, enough for a 500 × 500 map.
 func f1(x float64) string {
-	exact := new(big.Float).SetFloat64(x).Text('f', 80)
-	whole, frac, _ := strings.Cut(exact, ".")
-	n := new(big.Int)
-	n.SetString(whole+frac[:1], 10)
-	if frac[1] >= '5' {
-		n.Add(n, big.NewInt(1))
-	}
-	s := fmt.Sprintf("%02s", n.String())
-	return s[:len(s)-1] + "." + s[len(s)-1:]
+	return strconv.FormatFloat(x, 'f', 1, 64)
 }
 
 // hatch is hatching across a circle as plain strokes, 7 apart at 45°.
@@ -310,7 +301,7 @@ func drawSVG(seed int64) (land, labels, placed template.HTML) {
 	add(`<g fill="%s" stroke="%s" stroke-width="1.2">`, ink, ink)
 	for _, p := range places {
 		add(`  <g><title>%s</title><circle cx="%d" cy="%d" r="3.2" stroke="none"/><circle cx="%d" cy="%d" r="6" fill="none"/></g>`,
-			escape(fmt.Sprintf("%s [%d, %d]", p.Name, p.X, p.Y)), p.X, p.Y, p.X, p.Y)
+			html.EscapeString(fmt.Sprintf("%s [%d, %d]", p.Name, p.X, p.Y)), p.X, p.Y, p.X, p.Y)
 	}
 	add(`</g>`)
 	add(`<!-- the capital -->`)
@@ -338,7 +329,7 @@ func drawSVG(seed int64) (land, labels, placed template.HTML) {
 	add(`</g>`)
 	add(`<g font-size="12.5" font-weight="700" font-style="italic" fill="#4b4870" %s>`, halo)
 	for _, l := range landNames {
-		add(`  <text x="%d" y="%d" text-anchor="%s">%s</text>`, l.x, l.y, l.anchor, escape(l.text))
+		add(`  <text x="%d" y="%d" text-anchor="%s">%s</text>`, l.x, l.y, l.anchor, html.EscapeString(l.text))
 	}
 	add(`</g>`)
 	add(`<g font-size="11" font-weight="600" fill="%s" %s>`, ink, halo)
@@ -347,16 +338,11 @@ func drawSVG(seed int64) (land, labels, placed template.HTML) {
 			continue
 		}
 		o := labelOffset[p.Label]
-		add(`  <text x="%d" y="%d" text-anchor="%s">%s</text>`, p.X+o.dx, p.Y+o.dy, o.anchor, escape(p.Name))
+		add(`  <text x="%d" y="%d" text-anchor="%s">%s</text>`, p.X+o.dx, p.Y+o.dy, o.anchor, html.EscapeString(p.Name))
 	}
 	add(`</g>`)
 	labels = template.HTML(b.String())
 	return land, labels, placed
-}
-
-// escape escapes text for SVG the way the mockup did: & and < only.
-func escape(s string) string {
-	return strings.NewReplacer("&", "&amp;", "<", "&lt;").Replace(s)
 }
 
 // The terminal map: 50 × 25 cells, each 10 wide and 20 high.
@@ -464,96 +450,86 @@ func (t *Terrain) ASCII(g *Game, show func(*Player) bool) template.HTML {
 	return template.HTML(b.String())
 }
 
-// Markers are what a paper map shows over the terrain.
+// Markers say what a paper map shows over the terrain.
 type Markers struct {
 	Small     bool               // the map on a player's page: no names, items or quest
 	Highlight string             // the player to ring and name
 	Show      func(*Player) bool // the players to show
 }
 
-// SVG draws the markers, for after the terrain in an <svg viewBox="0 0 500 500">.
-func (m Markers) SVG(g *Game) template.HTML {
-	var b strings.Builder
-	q := g.Quest
-	if !m.Small && q != nil && q.Type == 2 {
-		fmt.Fprintf(&b, `<path stroke="%s" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round" d="M%d %d L%d %d"/>`,
-			ink, q.P1[0], q.P1[1], q.P2[0], q.P2[1])
-		for i, p := range []*[2]int{q.P1, q.P2} {
-			class := "map-quest-point"
-			if q.Stage > i+1 {
-				class += " passed"
+// Overlay is what the "markers" template draws after the terrain in an
+// <svg viewBox="0 0 500 500">.
+type Overlay struct {
+	Route   []QuestPoint // the two points of a quest to walk
+	Items   []MapItem
+	Players []Mark
+}
+
+type QuestPoint struct {
+	N, X, Y int
+	Passed  bool
+}
+
+// Mark is a player on a paper map.
+type Mark struct {
+	*Player
+	Radius      float64
+	Highlighted bool // ringed and named, also on the small map
+	Questing    bool // ringed as on the quest
+	Named       bool
+	Linked      bool // a link to the player's page
+}
+
+// For is the overlay of the game.
+func (m Markers) For(g *Game) Overlay {
+	var o Overlay
+	var questers []string
+	if q := g.Quest; !m.Small && q != nil {
+		questers = q.Players
+		if q.Type == 2 {
+			o.Route = []QuestPoint{
+				{1, q.P1[0], q.P1[1], q.Stage > 1},
+				{2, q.P2[0], q.P2[1], q.Stage > 2},
 			}
-			fmt.Fprintf(&b, `<g class="%s" transform="translate(%d %d)"><title>Точка квесту %d: [%d, %d]</title>`+
-				`<path d="M0 -13 L3.8 -4.2 13 -4 5.8 2 8 11 0 6 -8 11 -5.8 2 -13 -4 -3.8 -4.2Z" stroke="%s" stroke-width="2" stroke-linejoin="round"/>`+
-				`<text y="4" text-anchor="middle" font-family="Ubuntu Mono,monospace" font-weight="700" font-size="11" fill="%s">%d</text></g>`,
-				class, p[0], p[1], i+1, p[0], p[1], ink, ink, i+1)
 		}
 	}
 	if !m.Small {
-		for _, it := range g.MapItems {
-			fmt.Fprintf(&b, `<g transform="translate(%d %d)"><title>%s</title>`+
-				`<rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#ff6fae" stroke="%s" stroke-width="2"/></g>`,
-				it.X, it.Y, html.EscapeString(fmt.Sprintf("%s, рівень %d [%d, %d]", slotName(it.Type), it.Level, it.X, it.Y)), ink)
-		}
-	}
-	var questers []string
-	if !m.Small && q != nil {
-		questers = q.Players
+		o.Items = g.MapItems
 	}
 	for _, p := range g.Players {
 		if m.Show != nil && !m.Show(p) {
 			continue
 		}
-		b.WriteString(m.player(p, slices.Contains(questers, p.Name)))
+		mark := Mark{Player: p, Radius: 6.5, Highlighted: p.Name == m.Highlight,
+			Questing: slices.Contains(questers, p.Name), Named: !m.Small, Linked: !m.Small}
+		switch {
+		case mark.Highlighted:
+			mark.Radius, mark.Named = 10, true
+		case m.Small:
+			mark.Radius = 5
+		}
+		o.Players = append(o.Players, mark)
 	}
-	return template.HTML(b.String())
+	return o
 }
 
-func (m Markers) player(p *Player, questing bool) string {
-	highlighted := p.Name == m.Highlight
-	radius := 6.5
+// Kind is the class of the mark: npc, online or offline.
+func (m Mark) Kind() string {
 	switch {
-	case highlighted:
-		radius = 10
-	case m.Small:
-		radius = 5
+	case m.NPC:
+		return "npc"
+	case m.Online:
+		return "online"
 	}
-	kind := "offline"
-	switch {
-	case p.NPC:
-		kind = "npc"
-	case p.Online:
-		kind = "online"
+	return "offline"
+}
+
+// Ring is the radius of the quest ring, and where the name starts.
+func (m Mark) Ring() float64 { return m.Radius + 4 }
+
+func (m Mark) FontSize() int {
+	if m.Highlighted {
+		return 15
 	}
-	npc, status := "", "поза грою"
-	if p.NPC {
-		npc = " (NPC)"
-	}
-	if p.Online {
-		status = "в грі"
-	}
-	var b strings.Builder
-	fmt.Fprintf(&b, `<g class="map-player %s" transform="translate(%d %d)"><title>%s</title>`, kind, p.X, p.Y,
-		html.EscapeString(fmt.Sprintf("%s%s, рівень %d, %s [%d, %d]", p.Name, npc, p.Level, status, p.X, p.Y)))
-	if highlighted {
-		fmt.Fprintf(&b, `<circle class="map-player-halo" r="18" fill="#ffd43b" fill-opacity=".45" stroke="%s" stroke-width="2" stroke-dasharray="3 4"/>`, ink)
-	}
-	fmt.Fprintf(&b, `<circle class="map-player-dot" stroke="%s" stroke-width="2.5" r="%g"/>`, ink, radius)
-	if questing {
-		fmt.Fprintf(&b, `<circle class="map-player-quest" fill="none" stroke="#ff6fae" stroke-width="2.5" r="%g"/>`, radius+4)
-	}
-	if !m.Small || highlighted {
-		size := 12
-		if highlighted {
-			size = 15
-		}
-		fmt.Fprintf(&b, `<text class="map-player-name" y="4" font-family="Fixel Text,system-ui,sans-serif" font-weight="800" fill="%s" stroke="#fff8e3" stroke-width="3.5" paint-order="stroke" x="%g" font-size="%d">%s</text>`,
-			ink, radius+4, size, html.EscapeString(p.Name))
-	}
-	b.WriteString(`</g>`)
-	// the small map is a link to the big one as a whole
-	if m.Small {
-		return b.String()
-	}
-	return fmt.Sprintf(`<a href="%s">%s</a>`, playerURL(p.Name), b.String())
+	return 12
 }

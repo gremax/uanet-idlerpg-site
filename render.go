@@ -48,7 +48,7 @@ func NewSite() (*Site, error) {
 	if err := s.loadStatic(); err != nil {
 		return nil, err
 	}
-	layout, err := template.New("").Funcs(s.funcs()).ParseFS(files, "templates/layout.html")
+	layout, err := template.New("").Funcs(s.funcs()).ParseFS(files, "templates/layout.html", "templates/partials/*.html")
 	if err != nil {
 		return nil, err
 	}
@@ -168,6 +168,12 @@ func (p *Page) Age() time.Duration {
 
 func (p *Page) Left(pl *Player) int64 {
 	return p.Game.Left(pl, p.Now)
+}
+
+// Ticking says whether the player's timer counts down on the page: only
+// while they are online and the bot keeps writing the file.
+func (p *Page) Ticking(pl *Player) bool {
+	return pl.Online && !p.Stale()
 }
 
 // Linked is the text with every player's name made a link to their page.
@@ -497,11 +503,11 @@ func (p *Player) StatusColour() string {
 }
 
 // timer is a table cell counting down to the player's next level, or the
-// time standing still while they are offline.
+// time standing still while it does not tick.
 func (p *Page) timer(pl *Player, class string) Cell {
 	left := p.Left(pl)
 	c := Cell{Text: duration(left), Class: class}
-	if pl.Online {
+	if p.Ticking(pl) {
 		c.Left = &left
 	}
 	return c
@@ -594,7 +600,7 @@ func slotName(slot string) string {
 
 type mapView struct {
 	Terrain *Terrain
-	Markers template.HTML
+	Markers Overlay
 	ASCII   template.HTML
 	// the terminal's tables: where everyone and everything is, and the places
 	Where, Places template.HTML
@@ -610,7 +616,7 @@ func mapData(p *Page, _ *http.Request) (any, bool) {
 	if g == nil {
 		return v, true
 	}
-	v.Markers = Markers{}.SVG(g)
+	v.Markers = Markers{}.For(g)
 	v.ASCII = terrain.ASCII(g, everyone)
 	var rows [][]Cell
 	for _, pl := range g.Players {
@@ -688,7 +694,7 @@ type playerView struct {
 	ItemSum      int
 	Penalties    []penalty
 	PenaltyTotal int64
-	Minimap      template.HTML
+	Minimap      Overlay
 	// the terminal's: the label of the timer, dotted out, and two tables
 	NextLabel                string
 	TermItems, TermPenalties template.HTML
@@ -737,7 +743,7 @@ func playerData(p *Page, r *http.Request) (any, bool) {
 
 	v.NextLabel = fmt.Sprintf("до рівня %d", pl.Level+1)
 	v.NextLabel += strings.Repeat(".", max(0, 20-utf8.RuneCountInString(v.NextLabel)))
-	v.Minimap = Markers{Small: true, Highlight: pl.Name}.SVG(g)
+	v.Minimap = Markers{Small: true, Highlight: pl.Name}.For(g)
 	return v, true
 }
 
@@ -753,7 +759,8 @@ type questView struct {
 	// questers only
 	Place1, Place2 string
 	Terrain        *Terrain
-	Markers, ASCII template.HTML
+	Markers        Overlay
+	ASCII          template.HTML
 	// a quest for a time: the seconds left
 	EndsIn int64
 }
@@ -772,7 +779,7 @@ func questData(p *Page, _ *http.Request) (any, bool) {
 	if q.Type == 2 {
 		v.Place1, v.Place2 = placeAt(q.P1[0], q.P1[1]), placeAt(q.P2[0], q.P2[1])
 		questing := func(pl *Player) bool { return slices.Contains(q.Players, pl.Name) }
-		v.Markers = Markers{Show: questing}.SVG(g)
+		v.Markers = Markers{Show: questing}.For(g)
 		v.ASCII = terrain.ASCII(g, questing)
 	} else {
 		v.EndsIn = max(0, int64(q.Ends.Sub(p.Now)/time.Second))

@@ -17,7 +17,7 @@
             <td class="name"><a href="{{playerURL .Name}}">{{.Name}}</a></td>
             <td class="level num">{{.Level}}</td>
             <td class="player-class">{{.Class}}</td>
-            <td class="countdown num"{{if .Online}} data-left="{{$.Left .}}"{{end}}>{{duration ($.Left .)}}</td>
+            <td class="countdown num"{{if $.Ticking .}} data-left="{{$.Left .}}"{{end}}>{{duration ($.Left .)}}</td>
             <td class="tags">{{template "chips" .}}</td>
           </tr>
           {{- end}}
