@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
+	"math"
 	"net/http"
 	"path"
 	"regexp"
@@ -143,6 +144,12 @@ func (s *Site) funcs() template.FuncMap {
 		"at":        at,
 		"quarterOf": quarterOf,
 		"f1":        f1,
+		// what a copy button copies for a bot command: the private message, up
+		// to the first <placeholder>, for the player to fill in
+		"botCommand": func(cmd string) string {
+			stem, _, _ := strings.Cut(cmd, "<")
+			return "/msg IdleRPG " + stem
+		},
 		// the land for the "terrain" template: with its names for the big
 		// maps, bare for the small one
 		"terrain":     func() terrainView { return terrainView{terrain, true} },
@@ -196,6 +203,7 @@ var tabs = []Tab{
 	{"players", "/players", "Гравці", "[2] players"},
 	{"map", "/map", "Мапа", "[3] map"},
 	{"quest", "/quest", "Квест", "[4] quest"},
+	{"help", "/help", "Довідка", "[5] help"},
 }
 
 func (p *Page) Tabs() []Tab { return tabs }
@@ -473,6 +481,62 @@ var penaltiesTable = func() Table {
 		cells = append(cells, []Cell{{Text: r[0], Class: "t-fg"}, {Text: r[1], Class: class}})
 	}
 	return asciiTable([]int{16, 30}, heads("дія", "штраф"), cells)
+}()
+
+// rpbase and rpstep are the bot's, from docker/irpg.conf in the bot's repo:
+// the time to a level grows by rpstep with every level up to 60.
+const (
+	rpbase = 600
+	rpstep = 1.16
+)
+
+// ttl is the bot's time to the next level in seconds, from level lvl. The bot
+// takes it from the level a player leaves, so 0 to 1 and 1 to 2 both take
+// rpbase.
+func ttl(lvl int) float64 {
+	if lvl <= 60 {
+		return rpbase * math.Pow(rpstep, float64(lvl))
+	}
+	return rpbase*math.Pow(rpstep, 60) + 86400*float64(lvl-60)
+}
+
+// levelRow is a level, the time from it to the next, and from the start to
+// it, without penalties or events.
+type levelRow struct {
+	Level       int
+	Next, Total time.Duration
+}
+
+var levelRows = func() []levelRow {
+	var rows []levelRow
+	total := float64(rpbase) // to level 1
+	for lvl := 1; lvl <= 100; lvl++ {
+		if lvl == 1 || lvl%10 == 0 {
+			rows = append(rows, levelRow{lvl, seconds(ttl(lvl - 1)), seconds(total)})
+		}
+		total += ttl(lvl - 1)
+	}
+	return rows
+}()
+
+func seconds(s float64) time.Duration { return time.Duration(s) * time.Second }
+
+type helpView struct {
+	Levels                []levelRow
+	TermLevels, Penalties Table
+}
+
+func helpData(*Page, *http.Request) (any, bool) {
+	return helpView{Levels: levelRows, TermLevels: termLevels, Penalties: penaltiesTable}, true
+}
+
+var termLevels = func() Table {
+	var rows [][]Cell
+	for _, r := range levelRows {
+		rows = append(rows, []Cell{{Text: fmt.Sprint(r.Level), Class: "t-hi", Right: true},
+			{Text: elapsed(r.Next), Class: "t-fg"}, {Text: elapsed(r.Total), Class: "t-fg"}})
+	}
+	return asciiTable([]int{6, 13, 13}, heads("рівень", "до наступного", "від старту"), rows)
 }()
 
 // alignments are the names of g, n and e: in full, short, and the chip's class.

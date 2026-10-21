@@ -47,22 +47,14 @@
             <div class="command"><code>/msg IdleRPG REGISTER &lt;ім'я&gt; &lt;пароль&gt; &lt;клас&gt;</code><button class="copy" type="button" data-copy="/msg IdleRPG REGISTER " hidden>Копіювати</button></div>
           </li>
         </ol>
-        <p class="note">Далі нічого не роби. Просто лишайся в каналі, і персонаж росте сам.</p>
+        <p class="note">Далі нічого не роби. Просто лишайся в каналі, і персонаж росте сам. Решта команд і правила — у <a href="/help">довідці</a>.</p>
       </div>
     </section>
 
     <section class="container section">
       <h2>За що штраф</h2>
       <p class="lede section-intro">Будь-яка активність у каналі додає час до наступного рівня. Штраф множиться на 1,14 у степені твого рівня, тож що вищий рівень, то дорожче балакати.</p>
-      <div class="penalty-cards">
-        <div class="box"><b>Репліка в каналі</b><code>довжина повідомлення × 1,14^рівень</code></div>
-        <div class="box"><b>Зміна ніку</b><code>30 с × 1,14^рівень</code></div>
-        <div class="box"><b>Вихід з каналу</b><code>200 с × 1,14^рівень</code></div>
-        <div class="box"><b>Кік</b><code>250 с × 1,14^рівень</code></div>
-        <div class="box"><b>Quit</b><code>20 с × 1,14^рівень</code></div>
-        <div class="box"><b>LOGOUT</b><code>20 с × 1,14^рівень</code></div>
-        <div class="box"><b>Провал квесту</b><code>штраф отримують усі в грі</code></div>
-      </div>
+      {{template "penalty-cards"}}
     </section>
     {{- if .Game}}
 
@@ -106,7 +98,7 @@ IdleRPG на UAnet. Рівні ростуть, поки ти мовчиш.
 <span class="t-dim"># irc.uanet.net:6697 (tls)</span>
 <span class="t-hi">/join #idlerpg</span>
 <span class="t-hi">/msg IdleRPG REGISTER &lt;ім'я&gt; &lt;пароль&gt; &lt;клас&gt;</span>
-<span class="t-dim"># далі нічого не роби</span></pre>
+<span class="t-dim"># далі нічого не роби; решта: </span><a href="/help">man idlerpg</a></pre>
     </div>
 
     <div>

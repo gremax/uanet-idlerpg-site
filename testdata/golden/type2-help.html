@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Довідка · IdleRPG</title>
+<meta name="description" content="IdleRPG на UAnet: гра в IRC-каналі #idlerpg, де рівні ростуть, поки ти нічого не робиш.">
+<meta name="theme-color" content="#fffdf5">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Ccircle%20cx='11'%20cy='16'%20r='9'%20fill='%23ffd43b'/%3E%3Ccircle%20cx='21'%20cy='16'%20r='9'%20fill='%232338ff'/%3E%3C/svg%3E">
+<link rel="preload" href="/static/fonts/unbounded-900.HASH.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/fixel-text-var.HASH.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/style.HASH.css">
+<script>try{if(localStorage.getItem('rpg-mode')==='term')document.documentElement.dataset.mode='term'}catch(e){}</script>
+<script src="/static/app.HASH.js" defer></script>
+</head>
+<body>
+
+<div class="paper-view">
+  <header class="site-header">
+    <div class="container site-nav">
+      <a class="logo" href="/"><i></i><span>UAnet</span><b>IdleRPG</b></a>
+      <nav class="tabs" aria-label="Розділи">
+        <a href="/">Головна</a>
+        <a href="/players">Гравці</a>
+        <a href="/map">Мапа</a>
+        <a href="/quest">Квест</a>
+        <a href="/help" aria-current="page">Довідка</a>
+      </nav>
+      <span class="updated">оновлено 04:45 · 2 хв тому</span>
+      <button class="olds-btn" type="button" data-mode-toggle hidden>&gt;_ Для олдів</button>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="container section">
+      <h1>Довідка</h1>
+      <p class="lede page-intro">Майже все в грі бот робить сам. Тут команди, які він розуміє, і правила, за якими він рахує.</p>
+      <nav class="help-toc" aria-label="Зміст">
+        <a href="#commands">Команди</a><a href="#levels">Рівні</a><a href="#items">Предмети</a><a href="#battles">Бої</a><a href="#alignment">Світогляд</a><a href="#events">Події</a><a href="#quests">Квести</a><a href="#penalties">Штрафи</a>
+      </nav>
+    </section>
+
+    <section class="how" id="commands">
+      <div class="container section">
+        <h2>Команди</h2>
+        <p class="lede section-intro">Пиши боту в приват, <code>/msg IdleRPG &lt;команда&gt;</code>: кнопка так і копіює. Приватні повідомлення не штрафуються, штраф лише за те, що в каналі.</p>
+        <div class="command-groups">
+          <div>
+            <h3>Почати</h3>
+            <div class="box help-command"><div class="command"><code>REGISTER &lt;ім&#39;я&gt; &lt;пароль&gt; &lt;клас&gt;</code><button class="copy" type="button" data-copy="/msg IdleRPG REGISTER " hidden>Копіювати</button></div><p>Створює персонажа й одразу впускає в гру. Ім'я латиницею, до 16 символів, великі й малі літери розрізняються. Клас — будь-який текст до 30 символів, можна українською.</p></div>
+            <div class="box help-command"><div class="command"><code>LOGIN &lt;ім&#39;я&gt; &lt;пароль&gt;</code><button class="copy" type="button" data-copy="/msg IdleRPG LOGIN " hidden>Копіювати</button></div><p>Повертає в гру. Треба сидіти в #idlerpg. Якщо ти перезайшов з тим самим ніком і хостом, бот упустить тебе сам.</p></div>
+            <div class="box help-command"><div class="command"><code>LOGOUT</code><button class="copy" type="button" data-copy="/msg IdleRPG LOGOUT" hidden>Копіювати</button></div><p>Виходить з гри, і таймер зупиняється. Це штраф, як за quit.</p></div>
+          </div>
+          <div>
+            <h3>Дізнатися</h3>
+            <div class="box help-command"><div class="command"><code>WHOAMI</code><button class="copy" type="button" data-copy="/msg IdleRPG WHOAMI" hidden>Копіювати</button></div><p>Твій персонаж, рівень і час до наступного.</p></div>
+            <div class="box help-command"><div class="command"><code>STATUS &lt;ім&#39;я&gt;</code><button class="copy" type="button" data-copy="/msg IdleRPG STATUS " hidden>Копіювати</button></div><p>Рівень, клас, час до рівня, скільки простояно і сума предметів. Без імені — про тебе.</p></div>
+            <div class="box help-command"><div class="command"><code>QUEST</code><button class="copy" type="button" data-copy="/msg IdleRPG QUEST" hidden>Копіювати</button></div><p>Хто зараз на квесті і що їм лишилось.</p></div>
+            <div class="box help-command"><div class="command"><code>INFO</code><button class="copy" type="button" data-copy="/msg IdleRPG INFO" hidden>Копіювати</button></div><p>Версія бота й адміни, які зараз у мережі.</p></div>
+          </div>
+          <div>
+            <h3>Налаштувати</h3>
+            <div class="box help-command"><div class="command"><code>ALIGN good</code><button class="copy" type="button" data-copy="/msg IdleRPG ALIGN good" hidden>Копіювати</button></div><p>Світогляд: <code>good</code>, <code>neutral</code> або <code>evil</code>. Що він дає, <a href="#alignment">нижче</a>.</p></div>
+            <div class="box help-command"><div class="command"><code>NEWPASS &lt;пароль&gt;</code><button class="copy" type="button" data-copy="/msg IdleRPG NEWPASS " hidden>Копіювати</button></div><p>Новий пароль до персонажа.</p></div>
+            <div class="box help-command"><div class="command"><code>REMOVEME</code><button class="copy" type="button" data-copy="/msg IdleRPG REMOVEME" hidden>Копіювати</button></div><p>Видаляє персонажа назавжди, без перепитування.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section" id="levels">
+      <h2>Рівні</h2>
+      <p class="lede section-intro">До наступного рівня треба простояти 600 секунд × 1,16 у степені рівня, з якого виходиш. Тож з 0 на 1 і з 1 на 2 — по 10 хвилин, а далі кожен рівень на 16% довший за попередній. Після 60-го кожен наступний ще й на добу довший.</p>
+      <div class="box help-table-box narrow">
+        <table class="help-table">
+          <thead><tr><th>Рівень</th><th>До наступного</th><th>Від старту</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>10 хв</td><td>10 хв</td></tr>
+            <tr><td class="num">10</td><td>38 хв</td><td>3 години</td></tr>
+            <tr><td class="num">20</td><td>2 години</td><td>16 годин</td></tr>
+            <tr><td class="num">30</td><td>12 годин</td><td>3 дні</td></tr>
+            <tr><td class="num">40</td><td>2 дні</td><td>14 днів</td></tr>
+            <tr><td class="num">50</td><td>10 днів</td><td>62 дні</td></tr>
+            <tr><td class="num">60</td><td>44 дні</td><td>275 днів</td></tr>
+            <tr><td class="num">70</td><td>60 днів</td><td>816 днів</td></tr>
+            <tr><td class="num">80</td><td>70 днів</td><td>1463 дні</td></tr>
+            <tr><td class="num">90</td><td>80 днів</td><td>2210 днів</td></tr>
+            <tr><td class="num">100</td><td>90 днів</td><td>3056 днів</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Без штрафів і подій: бої, Рука Бога й квести зсувають це в обидва боки.</p>
+    </section>
+
+    <section class="container section flush-top" id="items">
+      <h2>Предмети</h2>
+      <div class="help-prose">
+        <p>У персонажа десять слотів: каблучка, амулет, оберіг, зброя, шолом, туніка, рукавиці, щит, поножі й чоботи. Сума рівнів усіх предметів — твоя сила в бою.</p>
+        <p>З кожним рівнем ти знаходиш предмет у випадковий слот, рівнем до півтора твого рівня, хоча високі трапляються рідко. Кращий за свій береш, гірший кидаєш на землю. Предмет на землі підбере той, хто на нього наступить і в кого в цьому слоті гірший. Поки лежить, він потроху іржавіє і втрачає рівні.</p>
+        <p>З 25-го рівня трапляються унікальні предмети, по шансу 1 з 40 за кожну знахідку:</p>
+      </div>
+      <div class="box help-table-box">
+        <table class="help-table">
+          <thead><tr><th>З рівня</th><th>Предмет</th><th>Його рівень</th></tr></thead>
+          <tbody>
+            <tr><td class="num">25</td><td>Всевидюча Велика Корона Маттта <small>шолом</small></td><td class="num">50–74</td></tr>
+            <tr><td class="num">25</td><td>Сяйлива Каблучка Блиску Джульєтти <small>каблучка</small></td><td class="num">50–74</td></tr>
+            <tr><td class="num">30</td><td>Захисний Латний Обладунок Res0 <small>туніка</small></td><td class="num">75–99</td></tr>
+            <tr><td class="num">35</td><td>Штормовий Магічний Амулет Двіна <small>амулет</small></td><td class="num">100–124</td></tr>
+            <tr><td class="num">40</td><td>Колосальний Меч Люті Йотуна <small>зброя</small></td><td class="num">150–174</td></tr>
+            <tr><td class="num">45</td><td>Ціпок Сліпої Люті Дрдінка <small>зброя</small></td><td class="num">175–200</td></tr>
+            <tr><td class="num">48</td><td>Чарівні Чоботи Прудкості Мрквіка <small>чоботи</small></td><td class="num">250–300</td></tr>
+            <tr><td class="num">52</td><td>Молот Тями Джеффа <small>зброя</small></td><td class="num">300–350</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="container section flush-top" id="battles">
+      <h2>Бої</h2>
+      <p class="lede section-intro">У бою кожен кидає кубик від нуля до суми своїх предметів, і більше число перемагає. Виграш і програш — у відсотках від твого часу до рівня.</p>
+      <div class="help-cards">
+        <div class="box"><h3>На новому рівні</h3><p>Бот кидає тебе на випадкового гравця в грі, а до 25-го рівня — лише в одному випадку з чотирьох. Перемога знімає з таймера рівень суперника / 4 відсотків, поразка додає рівень / 7, але не менше 7% в обох випадках. Суперником може бути й сам бот: у нього найкраща сума в грі плюс один.</p></div>
+        <div class="box"><h3>Зіткнення</h3><p>Персонажі самі бродять мапою. Двоє на одній клітинці можуть зчепитися, за тими самими правилами.</p></div>
+        <div class="box"><h3>Критичний удар</h3><p>Після перемоги буває, що суперник ще й отримує 5–24% до свого таймера. Шанс 1 з 35, а як залежить від світогляду — <a href="#alignment">нижче</a>.</p></div>
+        <div class="box"><h3>Трофей</h3><p>З 20-го рівня переможець в одному випадку з 25 міняється з переможеним предметом, якщо в того кращий.</p></div>
+        <div class="box"><h3>Три на три</h3><p>Коли в грі хоча б шестеро, дві трійки сусідів по мапі б'ються сумою предметів. Перша трійка виграє чи втрачає 20% від найменшого зі своїх таймерів.</p></div>
+        <div class="box"><h3>Війна</h3><p>Приблизно раз на 10 днів воюють чверті мапи. Переможна чверть отримує таймер удвічі коротший, програшна — удвічі довший. Хто стоїть точно на межі чвертей, той не воює.</p></div>
+      </div>
+    </section>
+
+    <section class="container section flush-top" id="alignment">
+      <h2>Світогляд</h2>
+      <p class="lede section-intro">Обирається командою <code>ALIGN</code> і змінюється будь-коли.</p>
+      <div class="help-cards">
+        <div class="box"><span class="chip good">добро</span><p>+10% до суми предметів у бою, критичний удар рідше: 1 з 50. Приблизно раз на 12 днів двоє добрих моляться разом, і обом мінус 5–12% часу. Але злі крадуть саме в добрих.</p></div>
+        <div class="box"><span class="chip neutral">нейтральність</span><p>Ні бонусів, ні ризиків. Критичний удар 1 з 35. З цим світоглядом починає кожен.</p></div>
+        <div class="box"><span class="chip evil">зло</span><p>−10% до суми предметів у бою, критичний удар частіше: 1 з 20. Приблизно раз на 8 днів або краде в доброго гравця предмет, кращий за свій, або боги відвертаються, і це плюс 1–5% часу.</p></div>
+      </div>
+    </section>
+
+    <section class="container section flush-top" id="events">
+      <h2>Події</h2>
+      <p class="lede section-intro">Що більше персонажів у грі, разом з NPC, то частіше щось стається, але з кожним окремо — так само часто. N у таблиці — скільки їх у грі.</p>
+      <div class="box help-table-box">
+        <table class="help-table">
+          <thead><tr><th>Подія</th><th>Як часто</th><th>Що робить</th></tr></thead>
+          <tbody>
+            <tr><td>Дар богів</td><td>раз на 4/N днів</td><td>−5–12% часу, або в одному випадку з 10 предмет стає на 10% кращим</td></tr>
+            <tr><td>Лихо</td><td>раз на 8/N днів</td><td>+5–12% часу, або в одному випадку з 10 предмет стає на 10% гіршим</td></tr>
+            <tr><td>Рука Бога</td><td>раз на 20/N днів</td><td>у чотирьох випадках з п'яти мінус 5–75% часу, інакше стільки ж додає</td></tr>
+            <tr><td>Три на три</td><td>раз на 24/N днів</td><td>бій двох трійок, якщо в грі хоча б шестеро</td></tr>
+            <tr><td>Війна</td><td>раз на 10 днів</td><td>чверті мапи, незалежно від N</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="container section flush-top" id="quests">
+      <h2>Квести</h2>
+      <div class="help-prose">
+        <p>Квест починається, коли в грі є щонайменше четверо гравців 40-го рівня й вище, які залогінені понад 10 годин. Бот обирає з них чотирьох і дає одне з двох завдань:</p>
+        <ul>
+          <li><b>На час:</b> протриматися 12–24 години без жодного штрафу.</li>
+          <li><b>Похід:</b> дійти до двох точок на мапі. Персонажі йдуть самі, повільно, шлях видно на сторінці <a href="/quest">квесту</a>.</li>
+        </ul>
+        <p>Успіх знімає з таймера кожного учасника чверть, а наступний квест буде не раніше ніж за 6 годин. Якщо хтось з учасників отримав штраф, квест провалено: штраф 15 с × 1,14^рівень отримують усі в грі, а наступний квест — не раніше ніж за 12 годин.</p>
+      </div>
+    </section>
+
+    <section class="container section flush-top" id="penalties">
+      <h2>Штрафи</h2>
+      <p class="lede section-intro">Будь-яка активність у каналі додає час до наступного рівня. Що вищий рівень, то дорожче балакати.</p>
+      <div class="penalty-cards">
+        <div class="box"><b>Репліка в каналі</b><code>довжина повідомлення × 1,14^рівень</code></div>
+        <div class="box"><b>Зміна ніку</b><code>30 с × 1,14^рівень</code></div>
+        <div class="box"><b>Вихід з каналу</b><code>200 с × 1,14^рівень</code></div>
+        <div class="box"><b>Кік</b><code>250 с × 1,14^рівень</code></div>
+        <div class="box"><b>Quit</b><code>20 с × 1,14^рівень</code></div>
+        <div class="box"><b>LOGOUT</b><code>20 с × 1,14^рівень</code></div>
+        <div class="box"><b>Провал квесту</b><code>штраф отримують усі в грі</code></div>
+      </div>
+      <p class="note">Один штраф не більший за 7 днів. За нетспліт штрафу немає: хто повернувся протягом 15 хвилин, той і далі в грі.</p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><span>irc.uanet.net · #idlerpg</span><a href="https://uanet.net">uanet.net</a></div>
+  </footer>
+</div>
+
+<div class="term-view">
+  <div class="container term-screen">
+    <nav class="term-nav" aria-label="Розділи">
+      <a href="/">[1] main</a>
+      <a href="/players">[2] players</a>
+      <a href="/map">[3] map</a>
+      <a href="/quest">[4] quest</a>
+      <a href="/help" aria-current="page">[5] help</a>
+      <span class="updated">оновлено 04:45 · 2 хв тому</span>
+      <button type="button" data-mode-toggle hidden>[ для нових ]</button>
+    </nav>
+
+    <div>
+      <div class="prompt"><b>guest@rpg</b>:~$ <span class="t-hi">man idlerpg</span></div>
+<pre class="wrapped t-fg">
+<span class="t-hi">КОМАНДИ</span>
+    <span class="t-dim">/msg IdleRPG &lt;команда&gt;, у приват без штрафу</span>
+
+    <span class="t-hi">REGISTER</span> &lt;ім'я&gt; &lt;пароль&gt; &lt;клас&gt;
+        новий персонаж. ім'я латиницею, до 16; клас до 30, можна українською
+    <span class="t-hi">LOGIN</span> &lt;ім'я&gt; &lt;пароль&gt;
+        повернутися в гру; з тим самим nick!user@host бот впустить сам
+    <span class="t-hi">LOGOUT</span>
+        вийти з гри; штраф, як за quit
+    <span class="t-hi">WHOAMI</span>
+        твій персонаж і час до рівня
+    <span class="t-hi">STATUS</span> [ім'я]
+        рівень, клас, таймер, простій, сума предметів
+    <span class="t-hi">QUEST</span>
+        хто на квесті і що їм лишилось
+    <span class="t-hi">INFO</span>
+        версія бота й адміни в мережі
+    <span class="t-hi">ALIGN</span> good|neutral|evil
+        світогляд, див. СВІТОГЛЯД
+    <span class="t-hi">NEWPASS</span> &lt;пароль&gt;
+        новий пароль
+    <span class="t-hi">REMOVEME</span>
+        видалити персонажа, без перепитування
+
+<span class="t-hi">РІВНІ</span>
+    600 с × 1.16^рівень, з якого виходиш. після 60-го ще +1 день за рівень.
+    без штрафів і подій:</pre>
+<pre class="ascii-table">
+&#43;--------&#43;---------------&#43;---------------&#43;
+| <span class="t-hi">рівень</span> | <span class="t-hi">до наступного</span> | <span class="t-hi">від старту</span>    |
+&#43;--------&#43;---------------&#43;---------------&#43;
+|      <span class="t-hi">1</span> | <span class="t-fg">10 хв</span>         | <span class="t-fg">10 хв</span>         |
+|     <span class="t-hi">10</span> | <span class="t-fg">38 хв</span>         | <span class="t-fg">3 години</span>      |
+|     <span class="t-hi">20</span> | <span class="t-fg">2 години</span>      | <span class="t-fg">16 годин</span>      |
+|     <span class="t-hi">30</span> | <span class="t-fg">12 годин</span>      | <span class="t-fg">3 дні</span>         |
+|     <span class="t-hi">40</span> | <span class="t-fg">2 дні</span>         | <span class="t-fg">14 днів</span>       |
+|     <span class="t-hi">50</span> | <span class="t-fg">10 днів</span>       | <span class="t-fg">62 дні</span>        |
+|     <span class="t-hi">60</span> | <span class="t-fg">44 дні</span>        | <span class="t-fg">275 днів</span>      |
+|     <span class="t-hi">70</span> | <span class="t-fg">60 днів</span>       | <span class="t-fg">816 днів</span>      |
+|     <span class="t-hi">80</span> | <span class="t-fg">70 днів</span>       | <span class="t-fg">1463 дні</span>      |
+|     <span class="t-hi">90</span> | <span class="t-fg">80 днів</span>       | <span class="t-fg">2210 днів</span>     |
+|    <span class="t-hi">100</span> | <span class="t-fg">90 днів</span>       | <span class="t-fg">3056 днів</span>     |
+&#43;--------&#43;---------------&#43;---------------&#43;</pre>
+<pre class="wrapped t-fg">
+
+<span class="t-hi">ПРЕДМЕТИ</span>
+    10 слотів; сума рівнів = сила в бою. на кожному рівні знахідка до
+    1.5 × рівень: краща замінює твою, гірша падає на землю й іржавіє.
+    з 25-го рівня унікальні, 1 з 40: корона (50–74), каблучка (50–74),
+    обладунок (75–99), амулет (100–124), меч (150–174), ціпок (175–200),
+    чоботи (250–300), молот (300–350).
+
+<span class="t-hi">БОЇ</span>
+    кидок rand(сума предметів), більший перемагає.
+    рівень:     до 25-го лише 1 з 4. виграш −max(7, рів. суперника/4)%,
+                програш +max(7, рів./7)% часу. бот теж б'ється.
+    зіткнення:  двоє на одній клітинці мапи
+    критичний:  після перемоги суперникові +5–24%
+    трофей:     з 20-го рівня 1 з 25, обмін предметом
+    3 на 3:     від 6 у грі, ±20% найменшого таймера трійки
+    війна:      ~раз на 10 днів, чверті мапи: ×0.5 або ×2
+
+<span class="t-hi">СВІТОГЛЯД</span>
+    <span class="t-green">good</span>     бій +10%, критичний 1/50, молитва вдвох −5–12% (~12 днів)
+    neutral  нічого, критичний 1/35
+    <span class="t-red">evil</span>     бій −10%, критичний 1/20, крадіжка в good або +1–5% (~8 днів)
+
+<span class="t-hi">ПОДІЇ</span>  <span class="t-dim">N = персонажів у грі</span>
+    дар          4/N днів   −5–12% часу або предмет +10%
+    лихо         8/N днів   +5–12% часу або предмет −10%
+    рука бога   20/N днів   −5–75% (4 з 5) або стільки ж +
+    3 на 3      24/N днів   від 6 у грі
+    війна          10 днів   не залежить від N
+
+<span class="t-hi">КВЕСТИ</span>
+    4 гравці рівня 40+, залогінені понад 10 год. на час (12–24 год)
+    або похід до двох точок мапи. успіх: −25% часу учасникам.
+    штраф учасника = провал: усім у грі 15 с × 1.14^рівень.
+
+<span class="t-hi">ШТРАФИ</span>
+    не більше 7 днів за раз. нетспліт до 15 хв без штрафу.</pre>
+<pre class="ascii-table">
+&#43;------------------&#43;--------------------------------&#43;
+| <span class="t-hi">дія</span>              | <span class="t-hi">штраф</span>                          |
+&#43;------------------&#43;--------------------------------&#43;
+| <span class="t-fg">репліка</span>          | <span class="t-fg">довжина × 1.14^рівень</span>          |
+| <span class="t-fg">зміна ніку</span>       | <span class="t-fg">30с × 1.14^рівень</span>              |
+| <span class="t-fg">вихід з каналу</span>   | <span class="t-fg">200с × 1.14^рівень</span>             |
+| <span class="t-fg">кік</span>              | <span class="t-fg">250с × 1.14^рівень</span>             |
+| <span class="t-fg">quit</span>             | <span class="t-fg">20с × 1.14^рівень</span>              |
+| <span class="t-fg">logout</span>           | <span class="t-fg">20с × 1.14^рівень</span>              |
+| <span class="t-fg">провал квесту</span>    | <span class="t-bad">штраф усім у грі</span>               |
+&#43;------------------&#43;--------------------------------&#43;</pre>
+    </div>
+
+    <div class="prompt"><b>guest@rpg</b>:~$ <span class="cursor"></span></div>
+  </div>
+</div>
+
+<div class="toast" role="status" hidden></div>
+</body>
+</html>

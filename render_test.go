@@ -197,7 +197,7 @@ func TestPages(t *testing.T) {
 		{"quest", "/quest", 200}}
 	// the pages that look the same in every variant, only in two
 	players := []page{{"player-Paganel", "/player/Paganel", 200}, {"player-Don", "/player/Don", 200},
-		{"player-missing", "/player/nobody", 404}, {"notfound", "/nope", 404}}
+		{"player-missing", "/player/nobody", 404}, {"notfound", "/nope", 404}, {"help", "/help", 200}}
 	s := site(t)
 	for _, variant := range []string{"type2", "type1", "noquest", "stale", "nodata"} {
 		var g *Game

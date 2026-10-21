@@ -24,6 +24,7 @@
         <a href="/players">Гравці</a>
         <a href="/map" aria-current="page">Мапа</a>
         <a href="/quest">Квест</a>
+        <a href="/help">Довідка</a>
       </nav>
       <span class="updated">оновлено 04:45 · 2 хв тому</span>
       <button class="olds-btn" type="button" data-mode-toggle hidden>&gt;_ Для олдів</button>
@@ -325,7 +326,18 @@
             <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17 V9 h3 v2 h3 v-2 h2 v2 h3 v-2 h3 V17Z" fill="#ffd43b" stroke="#14123a" stroke-width="1.6" stroke-linejoin="round"/></svg>столиця</li>
             <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1 V19 M1 10 H19" stroke="#14123a" stroke-opacity=".5" stroke-width="2" stroke-dasharray="4 2"/></svg>межі частин королівства</li>
           </ul>
-          <p class="note legend-note">Королівство ділиться на чотири частини по x = 250 і y = 250. Північ угорі. За цими частинами бот проводить війни.</p>
+          <p class="note legend-note">Королівство ділиться на чотири частини по x = 250 і y = 250. Північ угорі. За цими частинами бот проводить <a href="/help#battles">війни</a>.</p>
+          <h2 class="panel-title ground-heading">Місцевість</h2>
+          <ul class="legend">
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><g fill="#3ddc9f" stroke="#14123a" stroke-width="1.2"><circle cx="6" cy="12" r="4"/><circle cx="14" cy="13" r="3.5"/><circle cx="10" cy="6" r="3.5"/></g></svg>ліс</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 17 L10 3 L18 17Z" fill="#e8e4d4" stroke="#14123a" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.4 7.5 L10 3 L12.6 7.5 L11.2 8.6 L10 7.4 L8.8 8.6Z" fill="#fff" stroke="#14123a" stroke-width="1.1" stroke-linejoin="round"/></svg>гори</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M1 15 q9 -12 18 0" fill="#e8e4d4" stroke="#14123a" stroke-width="1.6" stroke-linecap="round"/></svg>пагорби</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 13 C6 6 12 15 18 7" fill="none" stroke="#bfe3ff" stroke-width="7" stroke-linecap="round"/><path d="M2 13 C6 6 12 15 18 7" fill="none" stroke="#2338ff" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="3 3"/></svg>річка</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" fill="#bfe3ff" stroke="#14123a" stroke-width="2"/></svg>озеро</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 6 h7 M11 9 h7 M4 13 h7 M10 17 h7" fill="none" stroke="#6aa58a" stroke-width="2" stroke-linecap="round"/></svg>болото</li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="#d9d2ea"/><path d="M14.6 5.4 L5.4 14.6 M10.9 3.4 L3.4 10.9 M16.6 9.1 L9.1 16.6" stroke="#4b4870"/><circle cx="10" cy="10" r="7.5" fill="none" stroke="#14123a" stroke-width="1.6" stroke-dasharray="3 2"/></svg>темні землі</li>
+          </ul>
+          <p class="note legend-note">Місцевість тут для краси: бот про неї не знає, і персонажі ходять крізь ліси, гори й воду однаково. Хто зайде за край мапи, з’явиться з протилежного боку.</p>
           <div>
             <h2 class="panel-title ground-heading">На землі</h2>
             <ul class="ground-items">
@@ -351,6 +363,7 @@
       <a href="/players">[2] players</a>
       <a href="/map" aria-current="page">[3] map</a>
       <a href="/quest">[4] quest</a>
+      <a href="/help">[5] help</a>
       <span class="updated">оновлено 04:45 · 2 хв тому</span>
       <button type="button" data-mode-toggle hidden>[ для нових ]</button>
     </nav>
@@ -388,7 +401,8 @@
 <span class="t-fg">
 <span class="t-hi">@</span> в грі   <span class="t-dim">o</span> поза грою   <span class="t-gold">n</span> npc   <span class="t-bad">+</span> предмет   <span class="t-gold">1 2</span> точки квесту
 <span class="t-gold">C</span> столиця   <span class="t-hi">*</span> місце   <span class="t-dim">| -</span> межі частин королівства
-<span class="t-dim">~</span> вода   <span class="t-ok">"</span> ліс   <span class="t-hi">^</span> гори   <span class="t-dim">m</span> пагорби   <span class="t-bad">%</span> темні землі   <span class="t-dim">,</span> болото</span></pre>
+<span class="t-dim">~</span> вода   <span class="t-ok">"</span> ліс   <span class="t-hi">^</span> гори   <span class="t-dim">m</span> пагорби   <span class="t-bad">%</span> темні землі   <span class="t-dim">,</span> болото
+<span class="t-dim"># місцевість для краси: бот про неї не знає, ходити можна всюди</span></span></pre>
     </div>
 
     <div>
