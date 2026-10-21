@@ -1,0 +1,17 @@
+{{define "title"}}Не знайдено · IdleRPG{{end}}
+
+{{define "paper"}}
+    <section class="container section">
+      <h1>Сторінку не знайдено</h1>
+      <p class="lede">Адреси {{.Data}} на сайті немає. Почніть з <a href="/">головної</a>.</p>
+    </section>
+{{end}}
+
+{{define "term"}}
+    <div>
+      {{template "prompt" (print "cd " .Data)}}
+<pre class="t-fg">
+<span class="t-bad">помилка: {{.Data}}: немає такої сторінки</span>
+почати: <a href="/">[1] main</a></pre>
+    </div>
+{{end}}
