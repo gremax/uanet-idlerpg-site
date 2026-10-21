@@ -1,0 +1,83 @@
+{{define "title"}}Квест · IdleRPG{{end}}
+
+{{define "nodata"}}Дані гри зараз недоступні, тож квесту не видно.{{end}}
+
+{{define "paper"}}
+    {{- if .Game}}
+    {{- with .Data.Quest}}
+    <section class="container section">
+      <span class="chip quest-badge">Квест триває</span>
+      <p class="quest-goal">Мета: {{.Text}}</p>
+      <div class="quest-players">
+        {{- range $.Data.Questers}}
+        <span class="chip{{if and .Player .Player.NPC}} npc{{end}}">{{if .Player}}<a href="{{playerURL .Name}}">{{.Name}}</a>{{else}}{{.Name}}{{end}}</span>
+        {{- end}}
+      </div>
+      {{- if eq .Type 2}}
+
+      <div>
+        <div class="quest-stages">
+          <div class="{{if eq .Stage 1}}current{{else}}passed{{end}}"><small>Етап 1{{if eq .Stage 1}} · зараз{{else}} · пройдено{{end}}</small>Дійти до {{with $.Data.Place1}}<b>{{.}}</b> {{end}}<b class="mono">{{at (index .P1 0) (index .P1 1)}}</b></div>
+          <div{{if eq .Stage 2}} class="current"{{end}}><small>Етап 2{{if eq .Stage 2}} · зараз{{end}}</small>Дійти до {{with $.Data.Place2}}<b>{{.}}</b> {{end}}<b class="mono">{{at (index .P2 0) (index .P2 1)}}</b></div>
+        </div>
+        <div class="box padded map-frame quest-map">
+          <svg viewBox="0 0 500 500" role="img" aria-label="Мапа світу 500 на 500">
+{{$.Data.Terrain.Land}}{{$.Data.Terrain.Labels}}{{$.Data.Terrain.Places}}{{$.Data.Markers}}
+          </svg>
+        </div>
+        <p class="note">Квест завершиться, коли всі учасники дійдуть до точки 2. Якщо хтось із них отримає штраф, провал і штраф усім.</p>
+      </div>
+      {{- else}}
+
+      <div>
+        <div class="box padded quest-deadline">
+          <span class="note">Завершення</span>
+          <div class="big-countdown num" data-left="{{$.Data.EndsIn}}">{{duration $.Data.EndsIn}}</div>
+          <span class="note">{{kyivDate .Ends}}</span>
+        </div>
+        <p class="note">Учасники мають протриматися до кінця без жодного штрафу.</p>
+      </div>
+      {{- end}}
+    </section>
+    {{- else}}
+    <section class="container">
+      <div class="no-quest">
+        <h1>Квесту зараз немає.</h1>
+        <p class="lede">Бот час від часу обирає кількох персонажів у грі й відправляє їх на завдання. Новий квест з’явиться тут і в #idlerpg.</p>
+      </div>
+    </section>
+    {{- end}}
+    {{- end}}
+{{end}}
+
+{{define "term"}}
+    {{- if .Game}}
+    {{- with .Data.Quest}}
+    <div>
+      {{template "prompt" "idlerpg quest"}}
+<pre class="wrapped t-fg">
+<span class="t-gold">QUEST</span>  <span>{{.Text}}</span>
+
+<span class="t-dim">учасники:</span> {{range $i, $q := $.Data.Questers}}{{if $i}}, {{end}}{{if .Player}}<a href="{{playerURL .Name}}">{{.Name}}</a>{{else}}{{.Name}}{{end}}{{end}}
+{{if eq .Type 2 -}}
+<span class="t-dim">маршрут:</span>  {{at (index .P1 0) (index .P1 1)}} {{$.Data.Place1}} -&gt; {{at (index .P2 0) (index .P2 1)}} {{$.Data.Place2}}
+<span class="t-dim">етап:</span>     <span class="t-hi">{{.Stage}}/2</span>  йдуть до точки {{.Stage}}
+{{else -}}
+<span class="t-dim">кінець:</span>   <span class="t-hi" data-left="{{$.Data.EndsIn}}">{{duration $.Data.EndsIn}}</span>  <span class="t-dim">({{kyivDate .Ends}})</span>
+{{- end}}</pre>
+    </div>
+    {{- if eq .Type 2}}
+
+    <div>
+      {{template "prompt" "idlerpg map --quest"}}
+      <pre class="ascii-map">{{$.Data.ASCII}}</pre>
+    </div>
+    {{- end}}
+    {{- else}}
+    <div>
+      {{template "prompt" "idlerpg quest"}}
+      <pre class="t-dim">квесту зараз немає. бот оголосить новий у #idlerpg.</pre>
+    </div>
+    {{- end}}
+    {{- end}}
+{{end}}

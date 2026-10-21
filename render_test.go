@@ -173,7 +173,8 @@ func TestPages(t *testing.T) {
 		name, path string
 		status     int
 	}
-	common := []page{{"index", "/", 200}, {"players", "/players", 200}, {"map", "/map", 200}}
+	common := []page{{"index", "/", 200}, {"players", "/players", 200}, {"map", "/map", 200},
+		{"quest", "/quest", 200}}
 	// the pages that look the same in every variant, only in two
 	players := []page{{"player-Paganel", "/player/Paganel", 200}, {"player-Don", "/player/Don", 200},
 		{"player-missing", "/player/nobody", 404}}

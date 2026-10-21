@@ -740,3 +740,42 @@ func playerData(p *Page, r *http.Request) (any, bool) {
 	v.Minimap = Markers{Small: true, Highlight: pl.Name}.SVG(g)
 	return v, true
 }
+
+type quester struct {
+	Name   string
+	Player *Player // nil if the bot has no such character
+}
+
+type questView struct {
+	Quest    *Quest
+	Questers []quester
+	// a quest to walk: the names of its points, and the maps with the
+	// questers only
+	Place1, Place2 string
+	Terrain        *Terrain
+	Markers, ASCII template.HTML
+	// a quest for a time: the seconds left
+	EndsIn int64
+}
+
+func questData(p *Page, _ *http.Request) (any, bool) {
+	v := questView{Terrain: terrain}
+	g := p.Game
+	if g == nil || g.Quest == nil {
+		return v, true
+	}
+	q := g.Quest
+	v.Quest = q
+	for _, name := range q.Players {
+		v.Questers = append(v.Questers, quester{name, g.Find(name)})
+	}
+	if q.Type == 2 {
+		v.Place1, v.Place2 = placeAt(q.P1[0], q.P1[1]), placeAt(q.P2[0], q.P2[1])
+		questing := func(pl *Player) bool { return slices.Contains(q.Players, pl.Name) }
+		v.Markers = Markers{Show: questing}.SVG(g)
+		v.ASCII = terrain.ASCII(g, questing)
+	} else {
+		v.EndsIn = max(0, int64(q.Ends.Sub(p.Now)/time.Second))
+	}
+	return v, true
+}
