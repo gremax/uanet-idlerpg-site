@@ -90,11 +90,15 @@ func parseGame(data []byte) (*Game, error) {
 	if g.Updated.IsZero() {
 		return nil, errors.New("no updated time")
 	}
-	if g.Quest != nil && g.Quest.Type == 2 && (g.Quest.P1 == nil || g.Quest.P2 == nil) {
-		return nil, errors.New("a type 2 quest without its points")
-	}
-	if g.Quest != nil && g.Quest.Type == 1 && g.Quest.Ends == nil {
-		return nil, errors.New("a type 1 quest without its end")
+	if q := g.Quest; q != nil {
+		switch {
+		case q.Type == 1 && q.Ends == nil:
+			return nil, errors.New("a type 1 quest without its end")
+		case q.Type == 2 && (q.P1 == nil || q.P2 == nil):
+			return nil, errors.New("a type 2 quest without its points")
+		case q.Type != 1 && q.Type != 2:
+			return nil, fmt.Errorf("a quest of type %d", q.Type)
+		}
 	}
 	g.JSON = data
 	for _, p := range g.Players {

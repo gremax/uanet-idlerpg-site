@@ -9,7 +9,7 @@ import (
 )
 
 // now is the time the tests look at the variants in testdata at, two minutes
-// after the bot wrote them, as in the mockup.
+// after the bot wrote them.
 var now = time.Date(2026, 10, 21, 1, 47, 0, 0, time.UTC)
 
 func load(t *testing.T, variant string) *Game {
@@ -130,6 +130,7 @@ func TestParseRejects(t *testing.T) {
 		"no updated time":  `{"players": []}`,
 		"type 2, no point": `{"updated": "2026-10-21T01:45:00Z", "quest": {"type": 2, "p1": [1, 2]}}`,
 		"type 1, no end":   `{"updated": "2026-10-21T01:45:00Z", "quest": {"type": 1}}`,
+		"another type":     `{"updated": "2026-10-21T01:45:00Z", "quest": {"type": 3}}`,
 	} {
 		if _, err := parseGame([]byte(data)); err == nil {
 			t.Errorf("%s: parsed", name)
