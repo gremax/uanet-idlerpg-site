@@ -60,36 +60,56 @@ func TestKyiv(t *testing.T) {
 	}
 }
 
+// partial renders one of templates/partials with data. html/template writes
+// "+" as "&#43;"; it is put back, so the ASCII art reads as it shows.
+func partial(t *testing.T, name string, data any) string {
+	t.Helper()
+	var b strings.Builder
+	if err := site(t).pages["index"].ExecuteTemplate(&b, name, data); err != nil {
+		t.Fatal(err)
+	}
+	return strings.ReplaceAll(b.String(), "&#43;", "+")
+}
+
 func TestLinkNames(t *testing.T) {
 	players := []*Player{{Name: "ira"}, {Name: "Don"}, {Name: "Donna"}, {Name: "a<b"}, {Name: "[x]"}}
-	for text, want := range map[string]string{
-		"ira і Don":   `<a href="/player/ira">ira</a> і <a href="/player/Don">Don</a>`,
-		"irate Donna": `irate <a href="/player/Donna">Donna</a>`,
-		"Don, ira!":   `<a href="/player/Don">Don</a>, <a href="/player/ira">ira</a>!`,
-		"xira ira_":   `xira ira_`,
-		"a<b & [x]":   `<a href="/player/a%3Cb">a&lt;b</a> &amp; <a href="/player/%5Bx%5D">[x]</a>`,
-		"<script>":    `&lt;script&gt;`,
-		"Їхні ira":    `Їхні <a href="/player/ira">ira</a>`,
+	name := func(n string) Piece { return Piece{n, true} }
+	text := func(s string) Piece { return Piece{s, false} }
+	for in, want := range map[string][]Piece{
+		"ira і Don":   {name("ira"), text(" і "), name("Don")},
+		"irate Donna": {text("irate "), name("Donna")},
+		"Don, ira!":   {name("Don"), text(", "), name("ira"), text("!")},
+		"xira ira_":   {text("xira ira_")},
+		"a<b & [x]":   {name("a<b"), text(" & "), name("[x]")},
+		"Їхні ira":    {text("Їхні "), name("ira")},
 	} {
-		if got := string(linkNames(text, players)); got != want {
-			t.Errorf("linkNames(%q)\n got %s\nwant %s", text, got, want)
+		if got := linkNames(in, players); !slices.Equal(got, want) {
+			t.Errorf("linkNames(%q)\n got %v\nwant %v", in, got, want)
 		}
 	}
 }
 
+func TestLinked(t *testing.T) {
+	got := partial(t, "linked", []Piece{{"a<b", true}, {" & <script>", false}})
+	if want := `<a href="/player/a%3Cb">a&lt;b</a> &amp; &lt;script&gt;`; got != want {
+		t.Errorf("got  %s\nwant %s", got, want)
+	}
+}
+
 func TestAsciiTable(t *testing.T) {
-	got := string(asciiTable([]int{4, 3},
-		[]Cell{{Text: "ім'я", Class: "t-hi"}, {Text: "рів", Class: "t-hi"}},
+	left := int64(403)
+	got := partial(t, "ascii-table", asciiTable([]int{4, 3, 5},
+		[]Cell{{Text: "ім'я", Class: "t-hi"}, {Text: "рів", Class: "t-hi"}, {Text: "до", Class: "t-hi"}},
 		[][]Cell{
-			{{Text: "ira", URL: "/player/ira"}, {Text: "7", Right: true}},
-			{{Text: "nullbyte"}, {Text: "<b>", Class: "t-bad"}},
+			{{Text: "ira", URL: "/player/ira"}, {Text: "7", Right: true}, {Text: "6:43", Left: &left}},
+			{{Text: "nullbyte"}, {Text: "<b>", Class: "t-bad"}, {}},
 		}))
-	want := "+------+-----+\n" +
-		`| <span class="t-hi">ім&#39;я</span> | <span class="t-hi">рів</span> |` + "\n" +
-		"+------+-----+\n" +
-		`| <a href="/player/ira">ira</a>  |   <span>7</span> |` + "\n" +
-		`| <span>nul…</span> | <span class="t-bad">&lt;b&gt;</span> |` + "\n" +
-		"+------+-----+"
+	want := "+------+-----+-------+\n" +
+		`| <span class="t-hi">ім&#39;я</span> | <span class="t-hi">рів</span> | <span class="t-hi">до</span>    |` + "\n" +
+		"+------+-----+-------+\n" +
+		`| <a href="/player/ira">ira</a>  |   <span>7</span> | <span data-left="403" data-width="5">6:43 </span> |` + "\n" +
+		`| <span>nul…</span> | <span class="t-bad">&lt;b&gt;</span> | <span></span>      |` + "\n" +
+		"+------+-----+-------+"
 	if got != want {
 		t.Errorf("got\n%s\nwant\n%s", got, want)
 	}

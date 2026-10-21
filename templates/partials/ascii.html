@@ -1,0 +1,19 @@
+{{/* The terminal's text art. It goes inside a <pre>, so every space and
+     line break here shows: the {{- trims only what is between actions. */}}
+
+{{/* A Table: rules, the header and the rows. */}}
+{{define "ascii-table"}}{{.Rule}}
+{{template "ascii-row" .Header}}
+{{.Rule}}
+{{range .Rows}}{{template "ascii-row" .}}
+{{end}}{{.Rule}}{{end}}
+
+{{/* A row of PaddedCells, without its line break. */}}
+{{define "ascii-row"}}|{{range .}} {{.Before}}
+  {{- if .Left}}<span{{with .Class}} class="{{.}}"{{end}} data-left="{{.Left}}" data-width="{{.Width}}">{{.Text}}</span>
+  {{- else if .URL}}<a{{with .Class}} class="{{.}}"{{end}} href="{{.URL}}">{{.Text}}</a>
+  {{- else}}<span{{with .Class}} class="{{.}}"{{end}}>{{.Text}}</span>
+  {{- end}}{{.After}} |{{end}}{{end}}
+
+{{/* The terminal map, from its Runs. */}}
+{{define "ascii-map"}}{{range .}}{{if .Class}}<span class="{{.Class}}">{{.Text}}</span>{{else}}{{.Text}}{{end}}{{end}}{{end}}

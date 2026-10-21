@@ -22,7 +22,7 @@
         </div>
         <div class="box padded map-frame quest-map">
           <svg viewBox="0 0 500 500" role="img" aria-label="Мапа світу 500 на 500">
-{{$.Data.Terrain.Land}}{{$.Data.Terrain.Labels}}{{$.Data.Terrain.Places}}{{template "markers" $.Data.Markers}}
+{{template "terrain" terrain}}{{template "markers" $.Data.Markers}}
           </svg>
         </div>
         <p class="note">Квест завершиться, коли всі учасники дійдуть до точки 2. Якщо хтось із них отримає штраф, провал і штраф усім.</p>
@@ -70,7 +70,7 @@
 
     <div>
       {{template "prompt" "idlerpg map --quest"}}
-      <pre class="ascii-map">{{$.Data.ASCII}}</pre>
+      <pre class="ascii-map">{{template "ascii-map" $.Data.ASCII}}</pre>
     </div>
     {{- end}}
     {{- else}}

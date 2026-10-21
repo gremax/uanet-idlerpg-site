@@ -1,6 +1,8 @@
 package main
 
 import (
+	"reflect"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -40,15 +42,12 @@ func TestPlaceAt(t *testing.T) {
 }
 
 func TestTerrainIsFixed(t *testing.T) {
-	a, b := drawTerrain(42), drawTerrain(42)
-	if a.Land != b.Land || a.grid != b.grid {
-		t.Error("the same seed draws a different map")
+	a := layTerrain(42)
+	if !reflect.DeepEqual(a, layTerrain(42)) {
+		t.Error("the same seed lays out a different map")
 	}
-	if drawTerrain(43).Land == a.Land {
-		t.Error("another seed draws the same map")
-	}
-	if !strings.Contains(string(a.Places), "<title>Столиця [325, 270]</title>") {
-		t.Error("no capital on the map")
+	if slices.Equal(layTerrain(43).Trees, a.Trees) {
+		t.Error("another seed lays out the same map")
 	}
 }
 
@@ -61,7 +60,7 @@ func TestASCIIMarkers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	got := string(terrain.ASCII(g, func(p *Player) bool { return p.Name != "hidden" }))
+	got := partial(t, "ascii-map", terrain.ASCII(g, func(p *Player) bool { return p.Name != "hidden" }))
 	first := strings.Split(got, "\n")[1]
 	want := `  0|<span class="t-hi">@</span><span class="t-gold">n</span>.<span class="t-bad">+</span><span class="t-gold">12</span>.`
 	if !strings.HasPrefix(first, want) {

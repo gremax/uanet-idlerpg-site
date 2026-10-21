@@ -1,0 +1,81 @@
+{{/* The land of a paper map, from a Terrain: the names on it only if
+     .Labels, as the small map on a player's page has no room for them. */}}
+{{define "terrain"}}
+{{- with .Terrain}}
+<rect width="500" height="500" fill="#fff8e3"/>
+<path d="{{.GridLines}}" fill="none" stroke="#e7dfc2"/>
+{{/* dark lands */}}
+<circle cx="{{.DarkLands.X}}" cy="{{.DarkLands.Y}}" r="{{.DarkLands.R}}" fill="#d9d2ea"/>
+<path d="{{.Hatching}}" fill="none" stroke="#4b4870"/>
+<circle cx="{{.DarkLands.X}}" cy="{{.DarkLands.Y}}" r="{{.DarkLands.R}}" fill="none" stroke="#14123a" stroke-width="2.5" stroke-dasharray="8 5"/>
+{{/* swamp */}}
+<path d="{{.Reeds}}" fill="none" stroke="#6aa58a" stroke-width="2" stroke-linecap="round"/>
+{{/* river and lake */}}
+<path d="{{.River}}" fill="none" stroke="#bfe3ff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="{{.River}}" fill="none" stroke="#2338ff" stroke-opacity=".35" stroke-width="2" stroke-dasharray="6 6"/>
+<circle cx="{{.Lake.X}}" cy="{{.Lake.Y}}" r="{{.Lake.R}}" fill="#bfe3ff" stroke="#14123a" stroke-width="3"/>
+{{/* forests */}}
+<g fill="#3ddc9f" stroke="#14123a" stroke-width="1.5">
+  {{- range .Trees}}
+  <circle cx="{{f1 .X}}" cy="{{f1 .Y}}" r="{{f1 .R}}"/>
+  {{- end}}
+</g>
+{{/* hills */}}
+<g fill="#e8e4d4" stroke="#14123a" stroke-width="2" stroke-linecap="round">
+  {{- range .Hills}}
+  <path d="{{.}}"/>
+  {{- end}}
+</g>
+{{/* mountains */}}
+<g stroke="#14123a" stroke-linejoin="round">
+  {{- range .Mountains}}
+  <path d="{{.Peak}}" fill="#e8e4d4" stroke-width="2"/>
+  <path d="{{.Snow}}" fill="#fff" stroke-width="1.5"/>
+  {{- end}}
+</g>
+{{/* the four parts of the realm */}}
+<path d="M250 0 V500 M0 250 H500" fill="none" stroke="#14123a" stroke-opacity=".45" stroke-width="2" stroke-dasharray="12 6"/>
+{{- if $.Labels}}
+{{/* names: the places, the capital and the frame go over them */}}
+<g font-size="10.5" font-weight="800" letter-spacing="1.5" fill="#14123a" fill-opacity=".6" stroke="#fff8e3" stroke-width="4" paint-order="stroke">
+  {{- range .QuarterNames}}
+  <text x="{{.X}}" y="{{.Y}}" text-anchor="{{.Anchor}}">{{.Text}}</text>
+  {{- end}}
+</g>
+<g font-size="12.5" font-weight="700" font-style="italic" fill="#4b4870" stroke="#fff8e3" stroke-width="4" paint-order="stroke">
+  {{- range .LandNames}}
+  <text x="{{.X}}" y="{{.Y}}" text-anchor="{{.Anchor}}">{{.Text}}</text>
+  {{- end}}
+</g>
+<g font-size="11" font-weight="600" fill="#14123a" stroke="#fff8e3" stroke-width="4" paint-order="stroke">
+  {{- range .PlaceNames}}
+  <text x="{{.X}}" y="{{.Y}}" text-anchor="{{.Anchor}}">{{.Text}}</text>
+  {{- end}}
+</g>
+{{- end}}
+{{/* quest places */}}
+<g fill="#14123a" stroke="#14123a" stroke-width="1.2">
+  {{- range .Places}}
+  <g><title>{{.Name}} {{at .X .Y}}</title><circle cx="{{.X}}" cy="{{.Y}}" r="3.2" stroke="none"/><circle cx="{{.X}}" cy="{{.Y}}" r="6" fill="none"/></g>
+  {{- end}}
+</g>
+{{/* the capital */}}
+{{- with .Capital}}
+<g transform="translate({{.X}} {{.Y}})" stroke="#14123a">
+  <title>{{.Name}} {{at .X .Y}}</title>
+  <path d="M-15 10 V-6 h5 v4 h4 v-4 h5 v4 h4 v-4 h5 v4 h4 v-4 h3 V10 Z" fill="#ffd43b" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M-3 10 v-7 a3 3 0 0 1 6 0 v7" fill="#14123a" stroke="none"/>
+  <path d="M0 -6 V-20 M0 -20 L9 -16.5 L0 -13" fill="#2338ff" stroke-width="2" stroke-linejoin="round"/>
+  <text y="27" text-anchor="middle" font-family="Unbounded,Arial Black,sans-serif" font-weight="900" font-size="12" fill="#14123a" stroke="#fff8e3" stroke-width="4" paint-order="stroke">{{.Name}}</text>
+</g>
+{{- end}}
+{{/* coordinates */}}
+<g font-family="Ubuntu Mono,monospace" font-size="11" fill="#9b8f62">
+  <text x="103" y="12">100</text><text x="3" y="97">100</text>
+  <text x="203" y="12">200</text><text x="3" y="197">200</text>
+  <text x="303" y="12">300</text><text x="3" y="297">300</text>
+  <text x="403" y="12">400</text><text x="3" y="397">400</text>
+</g>
+<rect x="1.5" y="1.5" width="497" height="497" fill="none" stroke="#14123a" stroke-width="3" rx="10"/>
+{{- end}}
+{{- end}}

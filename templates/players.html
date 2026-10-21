@@ -58,7 +58,7 @@
       {{template "prompt" "idlerpg top"}}
       {{- if .Humans}}
 <pre class="ascii-table">
-{{$.Data.Ranking}}</pre>
+{{template "ascii-table" $.Data.Ranking}}</pre>
       {{- else}}
       <pre class="t-dim">(гравців немає)</pre>
       {{- end}}
@@ -69,7 +69,7 @@
       {{template "prompt" "idlerpg npc"}}
 <pre class="ascii-table">
 # мешканці світу, у рейтинг не входять
-{{$.Data.NPCs}}</pre>
+{{template "ascii-table" $.Data.NPCs}}</pre>
     </div>
     {{- end}}
     {{- end}}

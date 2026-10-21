@@ -71,7 +71,7 @@
       {{- with .Data.Events}}
       <ul class="box events">
         {{- range .}}
-        <li>{{template "event-time" .}}<span>{{$.Linked .Text}}</span></li>
+        <li>{{template "event-time" .}}<span>{{template "linked" ($.Linked .Text)}}</span></li>
         {{- end}}
       </ul>
       {{- else}}
@@ -112,7 +112,7 @@ IdleRPG на UAnet. Рівні ростуть, поки ви мовчите.
     <div>
       {{template "prompt" "cat penalties.txt"}}
 <pre class="ascii-table">
-{{.Data.Penalties}}</pre>
+{{template "ascii-table" .Data.Penalties}}</pre>
     </div>
     {{- if .Game}}
 
@@ -121,7 +121,7 @@ IdleRPG на UAnet. Рівні ростуть, поки ви мовчите.
       {{- with .Data.Events}}
       <pre class="wrapped t-fg">
 {{- range .}}
-<span class="t-dim">[{{template "event-time" .}}]</span> {{$.Linked .Text}}
+<span class="t-dim">[{{template "event-time" .}}]</span> {{template "linked" ($.Linked .Text)}}
 {{- end}}</pre>
       {{- else}}
       <pre class="t-dim">(порожньо)</pre>

@@ -27,12 +27,14 @@ Checks: `gofmt -l .`, `go vet ./...`, `go test ./...`.
 ## Pages
 
 `templates/` holds one layout, a template per page, and in `partials/` the
-pieces several pages share, like the markers on the maps. Each page has its whole
-markup twice: the uanet.net look and, behind «>_ Для олдів», an amber terminal
-that prints the same as command output. `<html data-mode="term">` picks the
-terminal and the choice is kept in `localStorage`. The ASCII tables and the
-terminal map are text laid out by width, so they are built in Go (`render.go`,
-`terrain.go`). Every page is complete without JavaScript.
+pieces several pages share: the maps, the ASCII tables, names made links. Each
+page has its whole markup twice: the uanet.net look and, behind «>_ Для олдів»,
+an amber terminal that prints the same as command output. `<html
+data-mode="term">` picks the terminal and the choice is kept in `localStorage`.
+Every page is complete without JavaScript.
+
+All the markup is in the templates. The Go code works out what they show: the
+ranking, the padding of every ASCII table cell, where the trees stand.
 
 `static/app.js` is the only script. It counts the timers down from their
 `data-left` attributes, switches the look, copies the join commands and quietly
@@ -41,7 +43,7 @@ fetches the page again every minute. When a timer reaches zero it shows
 A file older than 5 minutes is stale: the pages say so, and the timers to the
 next level stand at what the file says, since the bot isn't counting either.
 
-The map's terrain is made up and drawn at startup from the fixed seed 42 in
+The map's terrain is made up and laid out at startup from the fixed seed 42 in
 `terrain.go`, so it is the same on every start. The four parts of the realm match
 the bot's wars (split at x and y 250, small y is north), and the places sit at
 the points of the quests in the bot's `events.uk.txt`. The names of the unique

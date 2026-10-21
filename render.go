@@ -6,7 +6,6 @@ import (
 	"embed"
 	"encoding/hex"
 	"fmt"
-	"html"
 	"html/template"
 	"io/fs"
 	"net/http"
@@ -143,10 +142,17 @@ func (s *Site) funcs() template.FuncMap {
 		"slotName":  slotName,
 		"at":        at,
 		"quarterOf": quarterOf,
-		// the terrain, without its labels, for the small map
-		"terrainLand":   func() template.HTML { return terrain.Land },
-		"terrainPlaces": func() template.HTML { return terrain.Places },
+		"f1":        f1,
+		// the land for the "terrain" template: with its names for the big
+		// maps, bare for the small one
+		"terrain":     func() terrainView { return terrainView{terrain, true} },
+		"bareTerrain": func() terrainView { return terrainView{terrain, false} },
 	}
+}
+
+type terrainView struct {
+	Terrain *Terrain
+	Labels  bool
 }
 
 // Page is what a page template gets.
@@ -176,8 +182,9 @@ func (p *Page) Ticking(pl *Player) bool {
 	return pl.Online && !p.Stale()
 }
 
-// Linked is the text with every player's name made a link to their page.
-func (p *Page) Linked(text string) template.HTML {
+// Linked is the text in pieces, for the "linked" template to make every
+// player's name a link to their page.
+func (p *Page) Linked(text string) []Piece {
 	return linkNames(text, p.Game.Players)
 }
 
@@ -241,7 +248,14 @@ func isNick(c rune) bool {
 		strings.ContainsRune("_-[]\\^{}|`", c)
 }
 
-func linkNames(text string, players []*Player) template.HTML {
+// Piece is a piece of text: a player's name, or anything else.
+type Piece struct {
+	Text   string
+	Player bool
+}
+
+// linkNames cuts text into pieces at the names of the players.
+func linkNames(text string, players []*Player) []Piece {
 	names := make([]string, 0, len(players))
 	for _, p := range players {
 		if p.Name != "" {
@@ -250,7 +264,12 @@ func linkNames(text string, players []*Player) template.HTML {
 	}
 	// the longest first, so "Don" does not take the start of "Donna"
 	slices.SortFunc(names, func(a, b string) int { return len(b) - len(a) })
-	var b strings.Builder
+	var pieces []Piece
+	add := func(text string, player bool) {
+		if text != "" {
+			pieces = append(pieces, Piece{text, player})
+		}
+	}
 	last := 0
 	prev := rune(0)
 	for i, c := range text {
@@ -266,16 +285,16 @@ func linkNames(text string, players []*Player) template.HTML {
 				if next, _ := utf8.DecodeRuneInString(text[i+len(n):]); isNick(next) {
 					continue
 				}
-				b.WriteString(html.EscapeString(text[last:i]))
-				fmt.Fprintf(&b, `<a href="%s">%s</a>`, playerURL(n), html.EscapeString(n))
+				add(text[last:i], false)
+				add(n, true)
 				last = i + len(n)
 				break
 			}
 		}
 		prev = c
 	}
-	b.WriteString(html.EscapeString(text[last:]))
-	return template.HTML(b.String())
+	add(text[last:], false)
+	return pieces
 }
 
 // plural picks the Ukrainian form for n: plural(5, "день", "дні", "днів").
@@ -351,61 +370,59 @@ type Cell struct {
 	Left  *int64 // a timer: the seconds left, which app.js counts down
 }
 
-// asciiTable draws a table the way a terminal program prints one:
+// Table is an ASCII table laid out the way a terminal program prints one,
+// for the "ascii-table" template:
 //
 //	+------+-----+
 //	| name | lvl |
 //	+------+-----+
 //	| ira  |  23 |
 //	+------+-----+
-//
-// Each column is as wide as widths says: longer text is cut with "…". The
-// frame is left to the colour of the <pre> around it.
-func asciiTable(widths []int, header []Cell, rows [][]Cell) template.HTML {
-	var b strings.Builder
-	rule := "+"
+type Table struct {
+	Rule   string
+	Header []PaddedCell
+	Rows   [][]PaddedCell
+}
+
+// PaddedCell is a cell cut to its column, and the spaces that fill the rest.
+// A timer keeps its spaces inside, for app.js to keep the width as the time
+// changes; a link keeps them outside, so only the text is underlined.
+type PaddedCell struct {
+	Cell
+	Width         int
+	Before, After string
+}
+
+// asciiTable lays out a table with columns as wide as widths says: longer
+// text is cut with "…".
+func asciiTable(widths []int, header []Cell, rows [][]Cell) Table {
+	t := Table{Rule: "+"}
 	for _, w := range widths {
-		rule += strings.Repeat("-", w+2) + "+"
+		t.Rule += strings.Repeat("-", w+2) + "+"
 	}
-	row := func(cells []Cell) {
-		b.WriteString("|")
+	row := func(cells []Cell) []PaddedCell {
+		padded := make([]PaddedCell, len(cells))
 		for i, c := range cells {
-			text := fit(c.Text, widths[i])
-			pad := strings.Repeat(" ", widths[i]-utf8.RuneCountInString(text))
-			class := ""
-			if c.Class != "" {
-				class = ` class="` + c.Class + `"`
-			}
-			var cell string
+			c.Text = fit(c.Text, widths[i])
+			p := PaddedCell{Cell: c, Width: widths[i]}
+			pad := strings.Repeat(" ", widths[i]-utf8.RuneCountInString(c.Text))
 			switch {
 			case c.Left != nil:
-				// the padding inside, for app.js to keep as the time changes
-				cell = fmt.Sprintf(`<span%s data-left="%d" data-width="%d">%s</span>`,
-					class, *c.Left, widths[i], html.EscapeString(text+pad))
-				pad = ""
-			case c.URL != "":
-				// the padding outside, so only the text is underlined
-				cell = fmt.Sprintf(`<a%s href="%s">%s</a>`, class, html.EscapeString(c.URL), html.EscapeString(text))
+				p.Text += pad
+			case c.Right:
+				p.Before = pad
 			default:
-				cell = fmt.Sprintf(`<span%s>%s</span>`, class, html.EscapeString(text))
+				p.After = pad
 			}
-			if c.Right {
-				cell = pad + cell
-			} else {
-				cell += pad
-			}
-			b.WriteString(" " + cell + " |")
+			padded[i] = p
 		}
-		b.WriteString("\n")
+		return padded
 	}
-	b.WriteString(rule + "\n")
-	row(header)
-	b.WriteString(rule + "\n")
+	t.Header = row(header)
 	for _, r := range rows {
-		row(r)
+		t.Rows = append(t.Rows, row(r))
 	}
-	b.WriteString(rule)
-	return template.HTML(b.String())
+	return t
 }
 
 // fit cuts text to width characters, with "…" in place of the rest.
@@ -423,7 +440,7 @@ const eventsShown = 15
 type indexView struct {
 	Leader    *Player
 	Events    []Event
-	Penalties template.HTML
+	Penalties Table
 }
 
 func indexData(p *Page, _ *http.Request) (any, bool) {
@@ -437,7 +454,7 @@ func indexData(p *Page, _ *http.Request) (any, bool) {
 	return v, true
 }
 
-var penaltiesTable = func() template.HTML {
+var penaltiesTable = func() Table {
 	rows := [][2]string{
 		{"репліка", "довжина × 1.14^рівень"},
 		{"зміна ніку", "30с × 1.14^рівень"},
@@ -524,7 +541,7 @@ func Podium(rank int) string {
 }
 
 type playersView struct {
-	Ranking, NPCs template.HTML // the terminal's tables
+	Ranking, NPCs Table // the terminal's tables
 }
 
 func playersData(p *Page, _ *http.Request) (any, bool) {
@@ -599,11 +616,10 @@ func slotName(slot string) string {
 }
 
 type mapView struct {
-	Terrain *Terrain
 	Markers Overlay
-	ASCII   template.HTML
+	ASCII   []Run
 	// the terminal's tables: where everyone and everything is, and the places
-	Where, Places template.HTML
+	Where, Places Table
 }
 
 func at(x, y int) string { return fmt.Sprintf("[%d, %d]", x, y) }
@@ -611,7 +627,7 @@ func at(x, y int) string { return fmt.Sprintf("[%d, %d]", x, y) }
 func everyone(*Player) bool { return true }
 
 func mapData(p *Page, _ *http.Request) (any, bool) {
-	v := mapView{Terrain: terrain}
+	var v mapView
 	g := p.Game
 	if g == nil {
 		return v, true
@@ -697,7 +713,7 @@ type playerView struct {
 	Minimap      Overlay
 	// the terminal's: the label of the timer, dotted out, and two tables
 	NextLabel                string
-	TermItems, TermPenalties template.HTML
+	TermItems, TermPenalties Table
 }
 
 func playerData(p *Page, r *http.Request) (any, bool) {
@@ -758,15 +774,14 @@ type questView struct {
 	// a quest to walk: the names of its points, and the maps with the
 	// questers only
 	Place1, Place2 string
-	Terrain        *Terrain
 	Markers        Overlay
-	ASCII          template.HTML
+	ASCII          []Run
 	// a quest for a time: the seconds left
 	EndsIn int64
 }
 
 func questData(p *Page, _ *http.Request) (any, bool) {
-	v := questView{Terrain: terrain}
+	var v questView
 	g := p.Game
 	if g == nil || g.Quest == nil {
 		return v, true

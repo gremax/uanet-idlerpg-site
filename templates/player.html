@@ -56,7 +56,7 @@
           <a class="box padded minimap" href="/map">
             <h3>На мапі <span class="mono note">{{at .X .Y}}</span></h3>
             <svg viewBox="0 0 500 500" role="img" aria-label="Мапа світу 500 на 500">
-{{terrainLand}}{{terrainPlaces}}{{template "markers" $.Data.Minimap}}
+{{template "terrain" bareTerrain}}{{template "markers" $.Data.Minimap}}
             </svg>
           </a>
         </aside>
@@ -92,13 +92,13 @@
     <div>
       {{template "prompt" (print "idlerpg items " .Name)}}
 <pre class="ascii-table">
-{{$.Data.TermItems}}</pre>
+{{template "ascii-table" $.Data.TermItems}}</pre>
     </div>
 
     <div>
       {{template "prompt" (print "idlerpg penalties " .Name)}}
 <pre class="ascii-table">
-{{$.Data.TermPenalties}}</pre>
+{{template "ascii-table" $.Data.TermPenalties}}</pre>
     </div>
     {{- else}}
     <div>

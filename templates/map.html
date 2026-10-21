@@ -9,7 +9,7 @@
       <div class="map-layout">
         <div class="box padded map-frame">
           <svg viewBox="0 0 500 500" role="img" aria-label="Мапа світу 500 на 500">
-{{.Data.Terrain.Land}}{{.Data.Terrain.Labels}}{{.Data.Terrain.Places}}{{template "markers" .Data.Markers}}
+{{template "terrain" terrain}}{{template "markers" .Data.Markers}}
           </svg>
         </div>
         <div class="box padded">
@@ -49,7 +49,7 @@
     {{- with .Game}}
     <div>
       {{template "prompt" "idlerpg map"}}
-<pre class="ascii-map">{{$.Data.ASCII}}
+<pre class="ascii-map">{{template "ascii-map" $.Data.ASCII}}
 <span class="t-fg">
 <span class="t-hi">@</span> в грі   <span class="t-dim">o</span> поза грою   <span class="t-gold">n</span> npc   <span class="t-bad">+</span> предмет   <span class="t-gold">1 2</span> точки квесту
 <span class="t-gold">C</span> столиця   <span class="t-hi">*</span> місце   <span class="t-dim">| -</span> межі частин королівства
@@ -59,13 +59,13 @@
     <div>
       {{template "prompt" "idlerpg where"}}
 <pre class="ascii-table">
-{{$.Data.Where}}</pre>
+{{template "ascii-table" $.Data.Where}}</pre>
     </div>
 
     <div>
       {{template "prompt" "idlerpg places"}}
 <pre class="ascii-table">
-{{$.Data.Places}}</pre>
+{{template "ascii-table" $.Data.Places}}</pre>
     </div>
     {{- end}}
 {{end}}

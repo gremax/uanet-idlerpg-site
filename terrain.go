@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html"
-	"html/template"
 	"math"
 	"slices"
 	"strconv"
@@ -76,10 +74,10 @@ func placeAt(x, y int) string {
 	return ""
 }
 
-type circle struct{ x, y, r float64 }
+type circle struct{ X, Y, R float64 }
 
 func (c circle) has(x, y float64) bool {
-	return (x-c.x)*(x-c.x)+(y-c.y)*(y-c.y) <= c.r*c.r
+	return (x-c.X)*(x-c.X)+(y-c.Y)*(y-c.Y) <= c.R*c.R
 }
 
 // The land, laid out around the quest places.
@@ -94,9 +92,9 @@ var (
 )
 
 type mapText struct {
-	text   string
-	x, y   int
-	anchor string
+	Text   string
+	X, Y   int
+	Anchor string
 }
 
 var landNames = []mapText{
@@ -126,11 +124,6 @@ var labelOffset = map[string]struct {
 	"bottom": {0, 17, "middle"},
 }
 
-const (
-	ink  = "#14123a"
-	halo = `stroke="#fff8e3" stroke-width="4" paint-order="stroke"`
-)
-
 // random is Park–Miller from seed: the same sequence on every run.
 func random(seed int64) func() float64 {
 	return func() float64 {
@@ -142,8 +135,8 @@ func random(seed int64) func() float64 {
 // pointIn is a uniformly random point within radius of (x, y).
 func pointIn(rand func() float64, c circle) (float64, float64) {
 	angle := rand() * math.Pi * 2
-	distance := math.Sqrt(rand()) * c.r
-	return c.x + math.Cos(angle)*distance, c.y + math.Sin(angle)*distance
+	distance := math.Sqrt(rand()) * c.R
+	return c.X + math.Cos(angle)*distance, c.Y + math.Sin(angle)*distance
 }
 
 func riverDistance(x, y float64) float64 {
@@ -184,165 +177,105 @@ func f1(x float64) string {
 // hatch is hatching across a circle as plain strokes, 7 apart at 45°.
 func hatch(c circle) string {
 	const step = 7.0
-	offset := (c.x+c.y)/math.Sqrt2 - 0.5
+	offset := (c.X+c.Y)/math.Sqrt2 - 0.5
 	var b strings.Builder
-	for k := math.Ceil((offset - c.r) / step); k*step < offset+c.r; k++ {
+	for k := math.Ceil((offset - c.R) / step); k*step < offset+c.R; k++ {
 		d := offset - k*step
-		half := math.Sqrt(c.r*c.r-d*d) - 1
+		half := math.Sqrt(c.R*c.R-d*d) - 1
 		if half <= 0 {
 			continue
 		}
-		fx, fy := c.x-d/math.Sqrt2, c.y-d/math.Sqrt2
+		fx, fy := c.X-d/math.Sqrt2, c.Y-d/math.Sqrt2
 		ex := half / math.Sqrt2
 		fmt.Fprintf(&b, "M%s %sL%s %s", f1(fx+ex), f1(fy-ex), f1(fx-ex), f1(fy+ex))
 	}
 	return b.String()
 }
 
-// Terrain is the map's land drawn once: for the paper map, three groups of
-// SVG to put in an <svg viewBox="0 0 500 500"> (the small map on a player's
-// page leaves out Labels), and for the terminal, a grid of glyphs.
+// Terrain is the map's land, laid out once: what the "terrain" template draws
+// on a paper map, and the grid of glyphs for the terminal's.
 type Terrain struct {
-	Land, Labels, Places template.HTML
-	grid                 [asciiRows][asciiColumns]rune
+	GridLines string // path data: the faint lines every 50
+	DarkLands circle
+	Hatching  string // path data, across the dark lands
+	Reeds     string // path data, in the swamp
+	River     string // path data
+	Lake      circle
+	Trees     []circle
+	Hills     []string // path data, one per hill
+	Mountains []mountain
+	Places    []Place
+	Capital   Place
+	// the names of the four parts, of the land, and of the quest places
+	QuarterNames, LandNames, PlaceNames []mapText
+
+	grid [asciiRows][asciiColumns]rune
 }
 
-var terrain = drawTerrain(42)
+// mountain is path data: a peak and its snowcap.
+type mountain struct{ Peak, Snow string }
 
-func drawTerrain(seed int64) *Terrain {
-	t := &Terrain{}
-	t.Land, t.Labels, t.Places = drawSVG(seed)
-	t.grid = drawGrid()
-	return t
-}
+var terrain = layTerrain(42)
 
-func drawSVG(seed int64) (land, labels, placed template.HTML) {
+// layTerrain lays the land out, with the trees, hills and mountains placed at
+// random from seed.
+func layTerrain(seed int64) *Terrain {
 	rand := random(seed)
-	var b strings.Builder
-	add := func(format string, args ...any) {
-		b.WriteString("  ")
-		fmt.Fprintf(&b, format, args...)
-		b.WriteString("\n")
-	}
+	t := &Terrain{DarkLands: darkLands, Hatching: hatch(darkLands), Lake: lake, Places: places,
+		Capital: capital, QuarterNames: quarterNames, LandNames: landNames, grid: drawGrid()}
 
-	add(`<rect width="%d" height="%d" fill="#fff8e3"/>`, worldSize, worldSize)
-	var grid strings.Builder
+	var lines strings.Builder
 	for g := 50; g < worldSize; g += 50 {
 		if g != 250 {
-			fmt.Fprintf(&grid, "M%d 0V%dM0 %dH%d", g, worldSize, g, worldSize)
+			fmt.Fprintf(&lines, "M%d 0V%dM0 %dH%d", g, worldSize, g, worldSize)
 		}
 	}
-	add(`<path d="%s" fill="none" stroke="#e7dfc2"/>`, grid.String())
+	t.GridLines = lines.String()
 
-	add(`<!-- dark lands -->`)
-	add(`<circle cx="%g" cy="%g" r="%g" fill="#d9d2ea"/>`, darkLands.x, darkLands.y, darkLands.r)
-	add(`<path d="%s" fill="none" stroke="#4b4870"/>`, hatch(darkLands))
-	add(`<circle cx="%g" cy="%g" r="%g" fill="none" stroke="%s" stroke-width="2.5" stroke-dasharray="8 5"/>`, darkLands.x, darkLands.y, darkLands.r, ink)
-
-	add(`<!-- swamp -->`)
 	var reeds strings.Builder
 	for range 60 {
 		x, y := pointIn(rand, swamp)
 		fmt.Fprintf(&reeds, "M%s %sh8", f1(x-4), f1(y))
 	}
-	add(`<path d="%s" fill="none" stroke="#6aa58a" stroke-width="2" stroke-linecap="round"/>`, reeds.String())
+	t.Reeds = reeds.String()
 
-	add(`<!-- river and lake -->`)
 	var points []string
 	for _, p := range river {
 		points = append(points, fmt.Sprintf("%g %g", p[0], p[1]))
 	}
-	riverPath := "M" + strings.Join(points, " L")
-	add(`<path d="%s" fill="none" stroke="#bfe3ff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>`, riverPath)
-	add(`<path d="%s" fill="none" stroke="#2338ff" stroke-opacity=".35" stroke-width="2" stroke-dasharray="6 6"/>`, riverPath)
-	add(`<circle cx="%g" cy="%g" r="%g" fill="#bfe3ff" stroke="%s" stroke-width="3"/>`, lake.x, lake.y, lake.r, ink)
+	t.River = "M" + strings.Join(points, " L")
 
-	add(`<!-- forests -->`)
-	add(`<g fill="#3ddc9f" stroke="%s" stroke-width="1.5">`, ink)
 	for _, f := range forests {
-		for range int(math.Floor(f.r*0.9 + 0.5)) {
+		for range int(math.Floor(f.R*0.9 + 0.5)) {
 			x, y := pointIn(rand, f)
 			if riverDistance(x, y) < 10 {
 				continue
 			}
-			add(`  <circle cx="%s" cy="%s" r="%s"/>`, f1(x), f1(y), f1(5+rand()*3))
+			t.Trees = append(t.Trees, circle{x, y, 5 + rand()*3})
 		}
 	}
-	add(`</g>`)
 
-	add(`<!-- hills -->`)
-	add(`<g fill="#e8e4d4" stroke="%s" stroke-width="2" stroke-linecap="round">`, ink)
 	for range 9 {
-		x, y := pointIn(rand, circle{hills.x, hills.y, hills.r - 6})
-		add(`  <path d="M%s %s q9 -12 18 0"/>`, f1(x-9), f1(y))
+		x, y := pointIn(rand, circle{hills.X, hills.Y, hills.R - 6})
+		t.Hills = append(t.Hills, fmt.Sprintf("M%s %s q9 -12 18 0", f1(x-9), f1(y)))
 	}
-	add(`</g>`)
 
-	add(`<!-- mountains -->`)
-	add(`<g stroke="%s" stroke-linejoin="round">`, ink)
 	for range 14 {
-		x, base := pointIn(rand, circle{mountains.x, mountains.y, mountains.r - 8})
+		x, base := pointIn(rand, circle{mountains.X, mountains.Y, mountains.R - 8})
 		y := base + 8
 		h := 14 + rand()*10
-		add(`  <path d="M%s %s L%s %s L%s %sZ" fill="#e8e4d4" stroke-width="2"/>`,
-			f1(x-h*0.7), f1(y), f1(x), f1(y-h), f1(x+h*0.7), f1(y))
-		add(`  <path d="M%s %s L%s %s L%s %s" fill="#fff" stroke-width="1.5"/>`,
-			f1(x-h*0.22), f1(y-h*0.68), f1(x), f1(y-h), f1(x+h*0.22), f1(y-h*0.68))
+		t.Mountains = append(t.Mountains, mountain{
+			Peak: fmt.Sprintf("M%s %s L%s %s L%s %sZ", f1(x-h*0.7), f1(y), f1(x), f1(y-h), f1(x+h*0.7), f1(y)),
+			Snow: fmt.Sprintf("M%s %s L%s %s L%s %s", f1(x-h*0.22), f1(y-h*0.68), f1(x), f1(y-h), f1(x+h*0.22), f1(y-h*0.68)),
+		})
 	}
-	add(`</g>`)
 
-	add(`<!-- the four parts of the realm -->`)
-	add(`<path d="M250 0 V%d M0 250 H%d" fill="none" stroke="%s" stroke-opacity=".45" stroke-width="2" stroke-dasharray="12 6"/>`, worldSize, worldSize, ink)
-	land = template.HTML(b.String())
-
-	// the places, the capital and the frame go over the names
-	b.Reset()
-	add(`<!-- quest places -->`)
-	add(`<g fill="%s" stroke="%s" stroke-width="1.2">`, ink, ink)
 	for _, p := range places {
-		add(`  <g><title>%s</title><circle cx="%d" cy="%d" r="3.2" stroke="none"/><circle cx="%d" cy="%d" r="6" fill="none"/></g>`,
-			html.EscapeString(fmt.Sprintf("%s [%d, %d]", p.Name, p.X, p.Y)), p.X, p.Y, p.X, p.Y)
-	}
-	add(`</g>`)
-	add(`<!-- the capital -->`)
-	add(`<g transform="translate(%d %d)" stroke="%s">`, capital.X, capital.Y, ink)
-	add(`  <title>%s [%d, %d]</title>`, capital.Name, capital.X, capital.Y)
-	add(`  <path d="M-15 10 V-6 h5 v4 h4 v-4 h5 v4 h4 v-4 h5 v4 h4 v-4 h3 V10 Z" fill="#ffd43b" stroke-width="2.5" stroke-linejoin="round"/>`)
-	add(`  <path d="M-3 10 v-7 a3 3 0 0 1 6 0 v7" fill="%s" stroke="none"/>`, ink)
-	add(`  <path d="M0 -6 V-20 M0 -20 L9 -16.5 L0 -13" fill="#2338ff" stroke-width="2" stroke-linejoin="round"/>`)
-	add(`  <text y="27" text-anchor="middle" font-family="Unbounded,Arial Black,sans-serif" font-weight="900" font-size="12" fill="%s" %s>%s</text>`, ink, halo, capital.Name)
-	add(`</g>`)
-	add(`<!-- coordinates -->`)
-	add(`<g font-family="Ubuntu Mono,monospace" font-size="11" fill="#9b8f62">`)
-	for c := 100; c < worldSize; c += 100 {
-		add(`  <text x="%d" y="12">%d</text><text x="3" y="%d">%d</text>`, c+3, c, c-3, c)
-	}
-	add(`</g>`)
-	add(`<rect x="1.5" y="1.5" width="497" height="497" fill="none" stroke="%s" stroke-width="3" rx="10"/>`, ink)
-	placed = template.HTML(b.String())
-
-	b.Reset()
-	add(`<g font-size="10.5" font-weight="800" letter-spacing="1.5" fill="%s" fill-opacity=".6" %s>`, ink, halo)
-	for _, q := range quarterNames {
-		add(`  <text x="%d" y="%d" text-anchor="%s">%s</text>`, q.x, q.y, q.anchor, q.text)
-	}
-	add(`</g>`)
-	add(`<g font-size="12.5" font-weight="700" font-style="italic" fill="#4b4870" %s>`, halo)
-	for _, l := range landNames {
-		add(`  <text x="%d" y="%d" text-anchor="%s">%s</text>`, l.x, l.y, l.anchor, html.EscapeString(l.text))
-	}
-	add(`</g>`)
-	add(`<g font-size="11" font-weight="600" fill="%s" %s>`, ink, halo)
-	for _, p := range places {
-		if p.Label == "" {
-			continue
+		if o, ok := labelOffset[p.Label]; ok {
+			t.PlaceNames = append(t.PlaceNames, mapText{p.Name, p.X + o.dx, p.Y + o.dy, o.anchor})
 		}
-		o := labelOffset[p.Label]
-		add(`  <text x="%d" y="%d" text-anchor="%s">%s</text>`, p.X+o.dx, p.Y+o.dy, o.anchor, html.EscapeString(p.Name))
 	}
-	add(`</g>`)
-	labels = template.HTML(b.String())
-	return land, labels, placed
+	return t
 }
 
 // The terminal map: 50 × 25 cells, each 10 wide and 20 high.
@@ -382,10 +315,13 @@ func drawGrid() (grid [asciiRows][asciiColumns]rune) {
 // the terminal's colours for the glyphs of the land
 var glyphColours = map[rune]string{'"': "t-ok", '^': "t-hi", '%': "t-bad", '*': "t-hi", 'C': "t-gold", '+': "t-hi"}
 
-// ASCII draws the terminal map with the game's markers: items, the quest's
-// points, and the players for whom show is true. The frame and the land
-// without a colour take the colour of the <pre> around it.
-func (t *Terrain) ASCII(g *Game, show func(*Player) bool) template.HTML {
+// Run is a stretch of the terminal map in one colour, or in the colour of
+// the <pre> around it.
+type Run struct{ Text, Class string }
+
+// ASCII lays out the terminal map with the game's markers: items, the quest's
+// points, and the players for whom show is true.
+func (t *Terrain) ASCII(g *Game, show func(*Player) bool) []Run {
 	type cell struct {
 		glyph  rune
 		colour string
@@ -418,36 +354,25 @@ func (t *Terrain) ASCII(g *Game, show func(*Player) bool) template.HTML {
 		}
 	}
 
-	// one span per run of a colour
-	var b strings.Builder
-	colour, run := "", ""
-	flush := func() {
-		if colour == "" {
-			b.WriteString(run)
-		} else {
-			fmt.Fprintf(&b, `<span class="%s">%s</span>`, colour, run)
+	var runs []Run
+	write := func(text, colour string) {
+		if n := len(runs); n > 0 && runs[n-1].Class == colour {
+			runs[n-1].Text += text
+			return
 		}
-		run = ""
-	}
-	write := func(s, c string) {
-		if c != colour {
-			flush()
-			colour = c
-		}
-		run += s
+		runs = append(runs, Run{text, colour})
 	}
 	edge := "   +" + strings.Repeat("-", asciiColumns) + "+"
 	write(edge, "")
 	for r, row := range cells {
 		write(fmt.Sprintf("\n%3d|", r*20), "")
 		for _, c := range row {
-			write(html.EscapeString(string(c.glyph)), c.colour)
+			write(string(c.glyph), c.colour)
 		}
 		write("|", "")
 	}
 	write("\n"+edge+"\n    0        100       200       300       400      500", "")
-	flush()
-	return template.HTML(b.String())
+	return runs
 }
 
 // Markers say what a paper map shows over the terrain.

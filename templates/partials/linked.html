@@ -1,0 +1,2 @@
+{{/* Text in Pieces, with every player's name a link to their page. */}}
+{{define "linked"}}{{range .}}{{if .Player}}<a href="{{playerURL .Text}}">{{.Text}}</a>{{else}}{{.Text}}{{end}}{{end}}{{end}}
