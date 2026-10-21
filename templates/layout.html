@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{block "title" .}}IdleRPG на UAnet{{end}}</title>
-<meta name="description" content="IdleRPG на UAnet: гра в IRC-каналі #idlerpg, де рівні ростуть, поки ви нічого не робите.">
+<meta name="description" content="IdleRPG на UAnet: гра в IRC-каналі #idlerpg, де рівні ростуть, поки ти нічого не робиш.">
 <meta name="theme-color" content="#fffdf5">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Ccircle%20cx='11'%20cy='16'%20r='9'%20fill='%23ffd43b'/%3E%3Ccircle%20cx='21'%20cy='16'%20r='9'%20fill='%232338ff'/%3E%3C/svg%3E">
 <link rel="preload" href="{{asset "fonts/unbounded-900.woff2"}}" as="font" type="font/woff2" crossorigin>
@@ -34,7 +34,7 @@
 
   <main>
     {{- if not .Game}}
-    <div class="container notice"><div class="warn">{{block "nodata" .}}Дані гри зараз недоступні.{{end}} Грати можна й так: підключіться до irc.uanet.net (6697, TLS) і напишіть /join #idlerpg.</div></div>
+    <div class="container notice"><div class="warn">{{block "nodata" .}}Дані гри зараз недоступні.{{end}} Грати можна й так: підключись до irc.uanet.net (6697, TLS) і напиши /join #idlerpg.</div></div>
     {{- else if .Stale}}
     <div class="container notice"><div class="warn">Дані гри не оновлювались {{elapsed .Age}}, тож таймери до рівня стоять.</div></div>
     {{- end}}
