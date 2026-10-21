@@ -1,0 +1,6 @@
+# Only what the Dockerfile copies.
+*
+!go.mod
+!*.go
+!templates/
+!static/
