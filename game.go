@@ -20,12 +20,15 @@ const staleAfter = 5 * time.Minute
 // Game is public.json as the bot writes it (lib/IRPG/Public.pm in the bot),
 // plus what the pages derive from it.
 type Game struct {
-	Updated  time.Time `json:"updated"`
-	Players  []*Player `json:"players"`
-	NPCNames []string  `json:"npc"`
-	MapItems []MapItem `json:"mapitems"`
-	Quest    *Quest    `json:"quest"`
-	Events   []Event   `json:"events"`
+	Updated time.Time `json:"updated"`
+	// Heard is when the bot last got a line from the IRC server, nil while it
+	// is not connected.
+	Heard    *time.Time `json:"heard"`
+	Players  []*Player  `json:"players"`
+	NPCNames []string   `json:"npc"`
+	MapItems []MapItem  `json:"mapitems"`
+	Quest    *Quest     `json:"quest"`
+	Events   []Event    `json:"events"`
 
 	// Humans is the ranking: by level, then by the least time to the next one.
 	Humans []*Player `json:"-"`
@@ -159,6 +162,21 @@ func (g *Game) OnlineHumans() int {
 // Stale says whether at now the bot has not written the file for too long.
 func (g *Game) Stale(now time.Time) bool {
 	return now.Sub(g.Updated) > staleAfter
+}
+
+// Down says why at now the bot is not playing, or "" while it is: it has not
+// written the file for too long, or it hears nothing from the IRC server,
+// which pings an idle bot every two minutes.
+func (g *Game) Down(now time.Time) string {
+	switch {
+	case g.Stale(now):
+		return fmt.Sprintf("the bot has not written public.json for %s", now.Sub(g.Updated).Round(time.Second))
+	case g.Heard == nil:
+		return "the bot is not connected to IRC"
+	case now.Sub(*g.Heard) > staleAfter:
+		return fmt.Sprintf("the bot has heard nothing from IRC for %s", now.Sub(*g.Heard).Round(time.Second))
+	}
+	return ""
 }
 
 // Left is the seconds to the player's next level at now. The bot counts

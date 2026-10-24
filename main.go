@@ -120,6 +120,20 @@ func (s *Site) Handler(game func() *Game, now func() time.Time) http.Handler {
 		w.Header().Set("Cache-Control", "no-cache")
 		w.Write(g.JSON)
 	})
+	// for a monitor: 503 and the reason while the bot is not playing
+	mux.HandleFunc("GET /status", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache")
+		g := game()
+		if g == nil {
+			http.Error(w, "the game has not been read yet", http.StatusServiceUnavailable)
+			return
+		}
+		if why := g.Down(now()); why != "" {
+			http.Error(w, why, http.StatusServiceUnavailable)
+			return
+		}
+		w.Write([]byte("ok\n"))
+	})
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("ok\n"))
 	})

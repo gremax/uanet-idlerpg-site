@@ -19,7 +19,9 @@ uanet-idlerpg-site -addr :8080 -data /data/public.json
 - `-now`: a fixed time to render the game at, for screenshots.
 
 Routes: `/`, `/players`, `/player/{name}`, `/map`, `/quest`, `/game.json` (the
-file as read, 503 until there is one), `/healthz`, and `/static/`, where every
+file as read, 503 until there is one), `/status` (for a monitor: `ok`, or 503 and
+the reason when public.json is over five minutes old or the bot has not heard
+the IRC server for as long), `/healthz`, and `/static/`, where every
 URL carries a hash of the file and is cached as immutable.
 
 Checks, as CI runs them: `golangci-lint run` (set up in `.golangci.yml`),

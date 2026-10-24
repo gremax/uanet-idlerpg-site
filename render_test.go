@@ -183,6 +183,25 @@ func TestGameJSON(t *testing.T) {
 	}
 }
 
+func TestStatus(t *testing.T) {
+	heard := now.Add(-time.Minute)
+	g := &Game{Updated: now.Add(-time.Minute), Heard: &heard}
+	h := site(t).Handler(func() *Game { return g }, func() time.Time { return now })
+	if r := get(t, h, "/status"); r.StatusCode != 200 {
+		t.Errorf("/status of a playing bot: %d, want 200", r.StatusCode)
+	}
+	g.Heard = nil
+	r := get(t, h, "/status")
+	body, _ := io.ReadAll(r.Body)
+	if r.StatusCode != 503 || string(body) != "the bot is not connected to IRC\n" {
+		t.Errorf("/status of a disconnected bot: %d %q, want 503 and why", r.StatusCode, body)
+	}
+	none := site(t).Handler(func() *Game { return nil }, func() time.Time { return now })
+	if r := get(t, none, "/status"); r.StatusCode != 503 {
+		t.Errorf("/status before the game is read: %d, want 503", r.StatusCode)
+	}
+}
+
 var staticHash = regexp.MustCompile(`\.[0-9a-f]{10}\.`)
 
 // TestPages renders each page for each variant in testdata and compares it

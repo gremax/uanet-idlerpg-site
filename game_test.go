@@ -124,6 +124,29 @@ func TestStale(t *testing.T) {
 	}
 }
 
+func TestDown(t *testing.T) {
+	heard := now.Add(-time.Minute)
+	g := &Game{Updated: now.Add(-time.Minute), Heard: &heard}
+	if why := g.Down(now); why != "" {
+		t.Errorf("a bot that writes and hears: %q, want none", why)
+	}
+	for _, c := range []struct {
+		name string
+		g    Game
+		want string
+	}{
+		{"stale file", Game{Updated: now.Add(-6 * time.Minute), Heard: &heard}, "the bot has not written public.json for 6m0s"},
+		{"disconnected", Game{Updated: now}, "the bot is not connected to IRC"},
+		{"hears nothing", Game{Updated: now, Heard: ptr(now.Add(-53 * time.Minute))}, "the bot has heard nothing from IRC for 53m0s"},
+	} {
+		if why := c.g.Down(now); why != c.want {
+			t.Errorf("%s: %q, want %q", c.name, why, c.want)
+		}
+	}
+}
+
+func ptr[T any](v T) *T { return &v }
+
 func TestParseRejects(t *testing.T) {
 	for name, data := range map[string]string{
 		"not JSON":         `{"updated": `,
